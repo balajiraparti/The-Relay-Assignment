@@ -23,6 +23,8 @@ No login/logout/me endpoints, user accounts, session cookies, password hashes or
 
 ## 4. Endpoint catalogue
 
+F04–F08 update: readiness loads only a validated schema-2 index manifest and checks all artifact hashes before model loading. Reingest old indexes. The shared gateway has separate bounded concurrency/queue admission, cumulative slot/backoff waiting and total model-call deadlines. A gateway deadline maps to timed_out; local/remote quota failures map to rate_limited. Stand-in selection is explicit; there is no automatic real-to-synthetic fallback. The provider streaming event contract is in backends.py; public API SSE/replay remains F13 work.
+
 Foundation implementation note (November 12): run `relay.cli migrate` before API startup. Schema mismatch prevents startup. Required telemetry queue/writer failure stops new request admission with HTTP 503 (`telemetry_unavailable`); the writer emits a minimal stderr warning and an incomplete marker when storage permits. These operational checks add no login or authentication endpoints. The complete endpoint/state catalogue below remains a target beyond F01–F03.
 
 All `/v1` endpoints are available to the local demo. Diagnostic/run actions are local tooling, not role-protected operations. Unknown filters return 422.

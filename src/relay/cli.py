@@ -35,7 +35,7 @@ async def probe(cfg,count):
 
 def execute():
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=['check','migrate','ingest','probe','ask','calibrate','export-events'])
+    parser.add_argument('command',choices=['check','audit','migrate','ingest','probe','ask','calibrate','export-events'])
     parser.add_argument('--count',type=int,default=3)
     parser.add_argument('--question',default='How does Moshi support simultaneous listening and speaking?')
     parser.add_argument('--observations')
@@ -43,6 +43,12 @@ def execute():
     if args.command in ('probe','ask'): cfg.require_provider()
     if args.command=='check':
         print(json.dumps({'model':cfg.groq_model,'backend':cfg.relay_backend,'api_key_present':bool(cfg.groq_api_key.get_secret_value()),'index_present':(cfg.runtime/'active.txt').exists()}))
+    elif args.command=='audit':
+        from relay.extraction import extract,save_audit
+        from relay.config import ROOT
+        audit=extract(ROOT/'data')
+        print(json.dumps({'artifact':str(save_audit(audit,cfg.runtime)),'pages':len(audit['pages']),
+                          'warnings':sum(len(p['warnings']) for p in audit['pages'])}))
     elif args.command=='migrate':
         from relay.migrations import migrate
         print(json.dumps({'schema_version':migrate(cfg.runtime/'relay.db')}))

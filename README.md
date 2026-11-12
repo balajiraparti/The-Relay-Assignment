@@ -9,6 +9,7 @@ uv venv .venv --python 3.11
 uv pip install --python .venv/Scripts/python.exe -e '.[dev]'
 .venv/Scripts/python.exe -m relay.cli check
 .venv/Scripts/python.exe -m relay.cli migrate
+.venv/Scripts/python.exe -m relay.cli audit
 .venv/Scripts/python.exe -m relay.cli ingest
 ```
 
@@ -54,12 +55,18 @@ Then start the main backend with `$env:RELAY_BACKEND='stand-in'`. Reset this env
 
 ## v0.1 boundaries
 
+F04–F08 are now verified. Source checksums are pinned by data/corpus.lock.json. Full extracted pages and warnings live in runtime/corpus; immutable index artifacts contain checksummed pages, keyword tokens and FAISS vectors. Exact chunk offsets, tokenizer limits and loaded model-weight hashes are checked before publication/readiness. Old revisions remain. Rebuild legacy indexes with `ingest`; runtime/active.txt records the selected revision. `scripts/verify_index_build.py` checks two identical builds, and `scripts/verify_retrieval.py` performs nine offline expected-paper checks, not a quality benchmark.
+
+Additional stand-in controls: STANDIN_QUEUE_LIMIT, STANDIN_TPM/RPD/TPD, STANDIN_LOAD_FACTOR, STANDIN_FAIL_FIRST_REQUESTS and STANDIN_FAIL_AFTER_CHUNKS. Set STANDIN_CALIBRATION to a measured profile JSON path to use paired delay samples. The seed and request ID select repeatable faults; fail-first injection depends on arrival order. Restart to change profiles. Windows timer granularity can coalesce very short chunk delays.
+
+`tests/test_gateway_http.py` starts isolated HTTP/SSE servers and checks streaming, failures, cooldown persistence, deadlines/cancellation, queues and retry-slot release. It never calls Groq. The assignment's custom stand-in requires no Postman install; evidence boundaries are in docs/standin.context.yaml.
+
 The detailed design documents remain the target; this first slice is not their full implementation. Current simplifications:
 
-- Numbered transactional SQLite migrations use the standard library (see DATABASE_DESIGN.md). The existing database upgrades to schema 2 with a verified backup. Full corpus/evaluation schemas remain pending.
+- Numbered transactional SQLite migrations use the standard library. Schema 3 adds persistent provider cooldowns, with verified upgrade backups. Corpus metadata is stored in immutable audit/index files; relational corpus materialization and evaluation schemas remain pending.
 - Correlated, redacted telemetry now uses a bounded background JSONL writer under `runtime/logs/`, with unique per-process run files, rotation, explicit failures and graceful flush. SQLite diagnostic export remains available; durable outbox delivery, complete module instrumentation and retention are later milestones.
 - Conservative rolling 60-second/24-hour reservations, using a UTF-8 byte bound for input tokens; no account-reset reconciliation or separate ITPM/OTPM yet.
-- At most ten active request tasks, two simultaneous provider calls, 45-second overall timeout. Fine-grained eight-second queue waiting enforcement is still pending.
+- At most ten active API tasks. The gateway defaults to two simultaneous calls, ten queued calls, an eight-second cumulative slot/backoff wait budget per logical call, and a 45-second call deadline. The pipeline also has a 45-second overall deadline. End-to-end dispatcher fairness and separate user queue timing remain later API/load work.
 - All initial retrieval settings share the 200-token recursive index (30 target overlap) to fit the small embedding model; R1 is BM25 top 4, R2 hybrid/rerank top 5, R3 hybrid/rerank top 6. The proposed 500/700-token index variants are not implemented.
 - Preparation is heuristic: vague referent templates clarify; long questions can make one rewrite call. Full semantic intent-preservation checks and multi-query decomposition remain pending.
 - Citation validation checks allowed IDs and paragraph coverage; it cannot prove entailment or sentence-level grounding.

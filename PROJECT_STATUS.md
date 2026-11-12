@@ -1,12 +1,12 @@
 # The Relay — project status and incremental build plan
 
-Last reviewed: November 12, 2026.
+Last reviewed: November 13, 2026 (F04–F08 work began November 12).
 
 ## Current state
 
 Version control: Git initialized with origin https://github.com/balajiraparti/The-Relay-Assignment.git. Main holds baseline f775d3b; dev contains project import b554b4a, successfully pushed to GitHub. Future important completed features are committed and pushed on dev after checks. Pull-request merges remain separate. Secrets and generated runtime artifacts are excluded. This setup does not complete another product milestone.
 
-**Phase: first runnable baseline; F01–F03 complete. Overall project is not complete.** The user authorized these three foundation features together. Their acceptance checks passed; remaining full-contract milestones remain partial or pending. Product/package version is 0.1.0, database schema version is 2. No hosted measurements were added in this work cycle.
+**Phase: F01–F08 complete. Overall project is not complete.** F04–F08 were explicitly authorized and verified together. Product/package version remains 0.1.0; database schema is 3. No hosted measurements were added in this work cycle.
 
 Workspace now contains the Python package under src/relay, Streamlit UI, tests, README, dependency manifest and runtime evidence. Original PDFs and .env have been preserved. Version markers in all three PDFs matched the brief; SHA-256 checksums were recorded. Groq key presence and three successful real calls were verified without printing the key.
 
@@ -15,15 +15,15 @@ Workspace now contains the Python package under src/relay, Streamlit UI, tests, 
 | Product and architecture | Documented | PRODUCT_REQUIREMENTS.md |
 | API contracts | Partially implemented | Request create/get/history/cancel, capabilities, papers and readiness; full contract still pending |
 | Database design | Foundation complete; later schemas pending | Numbered migrations, verified backups, constrained operations/requests/calls/events; corpus/evaluation/outbox schema remains pending |
-| Source PDFs | Version-marker verified and indexed | 120 PDF pages, 600 recursive chunks; runtime/indexes/8f3dd356072f433e/manifest.json contains checksums |
+| Source PDFs | Audited and durably extracted | Exact version markers and pinned data/corpus.lock.json hashes; 120 pages, 600 recursive chunks; full page text and warnings retained in immutable artifacts |
 | Local configuration | Verified for first probe | Key presence checked; three real calls succeeded |
 | Backend, retrieval and model integration | Partial first version verified | Real paper answer with two citations recorded in FIRST_RUN_RESULTS.md; broader quality grading pending |
 | Persistence | F03 foundation complete | Constraints, migration rollback, preserved legacy data and concurrent quota reservations tested |
-| Stand-in, logging and experiments | Telemetry foundation complete; rest partial | Bounded redacted JSONL writer; synthetic fault controls; initial real probes/calibration; experiment runner pending |
+| Stand-in, logging and experiments | Stand-in/gateway verified; experiments partial | Actual loopback HTTP/SSE fault tests; bounded workers/queues, deadlines, retries and persisted budgets/cooldowns; broader experiment runner pending |
 | UI | Initial Streamlit screen verified | Prior health/form checks passed; current running state not asserted; full browser/interaction coverage pending |
 | Build tracking | Complete | This file and AGENTS.md |
 
-**Completed milestones: F01, F02, F03 (3 of 16).** The current suite has 24 passing tests. This is a count of finished milestones, not an effort percentage. Initial real measurements exist; answer-quality and load benchmarks are not complete.
+**Completed milestones: F01–F08 (8 of 16).** The final suite has 54 passing tests. This milestone count is not an effort percentage. Initial real measurements exist; answer-quality and load benchmarks are not complete.
 
 ## How to use this file
 
@@ -43,7 +43,7 @@ No feature silently adds paid services, replaces the selected architecture, rest
 
 ## Modular implementation backlog
 
-Current milestone states: F01 Done; F02 Done (telemetry foundation); F03 Done (persistence foundation). F04–F13 remain partial; F14 partial provider probe only; F15a has basic form verification; F15b/F15c and F16 pending. The table preserves full acceptance criteria.
+Current milestone states: F01–F08 Done; F09–F13 remain partial; F14 partial provider probe only; F15a has basic form verification; F15b/F15c and F16 pending. The table preserves full acceptance criteria.
 
 | ID | Feature / boundary | Dependencies | Acceptance / demonstrable output |
 | --- | --- | --- | --- |
@@ -85,7 +85,21 @@ F09 has a real-service prerequisite; F07–08 can be implemented and tested with
 
 ## Next work item
 
-**Next: F04 corpus audit/extraction acceptance review.** Preserve the existing index; verify extraction warnings and durable page metadata before marking F04 complete. No additional feature has been started. Fixed-question grading and load experiments remain later work.
+**Next: F09 real-provider adapter/calibration acceptance review.** Reuse the existing modest observations, review account/reset evidence and remaining calibration gaps before adding any live probes. No later milestone was started. F04–F08 are Done within the boundaries below; source PDFs, secrets, existing history and old indexes were preserved.
+
+### F04–F08 completion evidence
+
+Final verification: 54 tests passed in 16.95 s. Two final independent builds returned revision 532f423d5a5967b8 with 600 chunks and valid page offsets; all nine offline expected-paper/retrieval-setting smoke checks passed using real cached local models. Full extracted pages and weight/tokenizer fingerprints are retained. Extraction found zero empty/sparse/replacement-character warnings; scientific reading order still requires grading. No Groq requests were made.
+
+| Feature | Changed-file evidence | Scope and limitations |
+| --- | --- | --- |
+| F04 | extraction.py, data/corpus.lock.json, CLI audit, test_corpus.py | Checks exact file set, pinned hashes and version markers; stores pages and extraction warnings. No OCR or reconstruction of tables/equations; warning-free extraction is not proof of layout correctness. |
+| F05 | corpus.py, test_corpus.py, scripts/verify_index_build.py | Exact source spans; final token caps; tokenizer/loaded-weight fingerprints; canonical manifests; checksums before FAISS loading; atomic publication; old revisions retained. Full page/corpus metadata uses immutable JSON artifacts rather than duplicate SQLite rows. |
+| F06 | corpus.py, pipeline.py, scripts/verify_retrieval.py | 12 lexical/12 dense candidates, top-16 RRF, top-5/6 cross-encoder evidence; original-question reranking, deterministic ties, bounded input checks and correlated diagnostics. Nine expected-paper smoke checks are not manual evidence/answer grading. |
+| F07 | backends.py, standin.py, test_standin.py, test_gateway_http.py, docs/standin.context.yaml | One streamed event contract; isolated seeded profiles; worker/queue limits; load delay; quota/503/midstream faults; optional empirical latency profile. Fault tests use synthetic settings and real loopback HTTP, not Groq or a Postman deployment. |
+| F08 | gateway.py, store.py, migrations.py, config.py, pipeline.py, gateway/store/pipeline tests | Shared bounded call admission, cumulative waiting and total deadline, maximum three transport attempts, no retries after content, backoff outside slots, persisted source-specific cooldown and rolling budgets, conservative crash/cancel accounting. Exact provider reset reconciliation and real concurrency limits remain F09 evidence work. |
+
+Remaining scope boundaries: the eight-second gateway wait budget is per logical call; end-to-end dispatcher admission/fairness belongs to F13/F14. CPU extraction/retrieval jobs are not forcibly terminated by cancelling their awaiting coroutine. Complete benchmark capture/quality grading and API SSE replay remain pending.
 
 ### F01–F03 completion evidence
 
@@ -115,6 +129,10 @@ The user explicitly requested a runnable initial version and real measurements i
 
 | Date | Scope | Check | Result |
 | --- | --- | --- | --- |
+| 2026-11-12 | F04–F08 regression | `.venv/Scripts/python.exe -m pytest -q` with loopback permission | 54 passed in 16.95 s; includes 13 real loopback HTTP scenarios plus parser/unit/integration checks; no Groq calls |
+| 2026-11-12 | F04–F05 real corpus/reproducibility | `HF_HUB_OFFLINE=1` then `scripts/verify_index_build.py` | Two matching builds: 532f423d5a5967b8; 120 pages, 600 chunks; valid source spans; pinned source/tokenizer/weight/artifact hashes; old indexes retained; runtime/verification/index_build.json |
+| 2026-11-12 | F06 actual local models | `HF_HUB_OFFLINE=1` then `scripts/verify_retrieval.py` | 9/9 expected-paper and bounded-evidence checks across R1/R2/R3; runtime/verification/retrieval.json; not a quality benchmark |
+| 2026-11-12 | F08 durable state | `relay.cli migrate` and existing-history check | Schema 3 applied after verified backup; all five existing requests retained; cooldown/recovery/day-budget tests pass |
 | 2026-11-12 | F01–F03 final regression | `.venv/Scripts/python.exe -m pytest -q` with loopback permission | 24 passed in 2.44 s; tests use fixtures, no hosted calls |
 | 2026-11-12 | F03 runtime upgrade | `relay.cli migrate`, repeated upgrade and comparison with pre-v2 backup | Schema 2; integrity/FK checks pass; request/call/event row counts preserved |
 | 2026-11-12 | F01 configuration | `relay.cli check` | Key presence and index presence true; no secret output |
@@ -133,6 +151,7 @@ Add feature-specific executed checks here; planned checks belong in the backlog 
 
 | Date | Change | Implementation impact |
 | --- | --- | --- |
+| 2026-11-12 | Completed F04–F08: audited corpus lock/pages, immutable checked indexes, retrieval diagnostics, backend event adapter, isolated stand-in, bounded gateway and schema-3 cooldowns; updated PRD/API/DB/README/examples | F01–F08 Done; 54 tests pass; real local corpus/model checks pass; no hosted load or fabricated results; F09 is next |
 | 2026-11-12 | Initialized Git, configured origin/main/dev and documented ongoing commit/push workflow in AGENTS.md | Reviewed 32 staged project files; configured Groq key absent; .env, caches, virtual environment and runtime evidence excluded; no product behaviour change |
 | 2026-11-12 | Audited/completed F01–F03; added telemetry.py and migrations.py, tightened config, wired API/CLI, added regression tests; aligned PRD/API/DB/README | F01–F03 Done; 24 passing tests; runtime schema 2 with verified backup; no new model calls; remaining milestones unchanged |
 | 2026-11-12 | Implemented src/relay, ui/app.py, tests, pyproject.toml, README and local index/probe evidence | F01 complete; working first-version modules with documented gaps; no fabricated benchmark tables |

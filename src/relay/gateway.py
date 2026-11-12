@@ -1,92 +1,91 @@
 import asyncio
-import json
+import random
 import time
-import uuid
-import httpx
-
-
-class ModelError(Exception):
-    def __init__(self, code, status=None, retry_after=None):
-        super().__init__(code)
-        self.code, self.status, self.retry_after = code, status, retry_after
+from relay.backends import HTTPBackend, ModelError
 
 
 class Gateway:
-    def __init__(self,cfg,store):
-        self.cfg, self.store = cfg,store
-        self.slots = asyncio.Semaphore(2)
-        self.cooldown_until = 0.0
+    def __init__(self,cfg,store,backend=None):
+        self.cfg,self.store=cfg,store
+        self.backend=backend or HTTPBackend(cfg)
+        self.slots=asyncio.Semaphore(cfg.model_concurrency)
+        self.cooldown_until=0.; self.pending=0
 
     async def generate(self,rid,messages,stage='generation',cap=1024):
-        cfg = self.cfg
-        if cfg.relay_backend not in ('groq','stand-in'):
-            raise ModelError('invalid_backend')
-        if cfg.relay_backend == 'groq' and not cfg.groq_api_key.get_secret_value():
-            raise ModelError('missing_api_key')
-        # Conservative UTF-8 byte bound rather than a falsely precise tokenizer guess.
-        estimate = sum(len(m['content'].encode('utf-8'))+32 for m in messages)+cap
-        limits = (cfg.groq_rpm,cfg.groq_tpm,cfg.groq_rpd,cfg.groq_tpd)
-        start = time.perf_counter()
-        for attempt in range(1,4):
-            if self.cooldown_until > time.monotonic():
-                raise ModelError('provider_cooldown',429)
-            async with self.slots:
-                try:
-                    cid = self.store.reserve(rid,cfg.relay_backend,estimate,limits)
-                except ValueError as e:
-                    raise ModelError(str(e),429) from None
-                self.store.event(rid,'model_started',call_id=cid,stage=stage,attempt=attempt,estimated_tokens=estimate,source=cfg.relay_backend)
-                self.store.call_state(cid,'dispatched')
-                endpoint = 'https://api.groq.com/openai/v1/chat/completions' if cfg.relay_backend=='groq' else 'http://127.0.0.1:8001/v1/chat/completions'
-                headers = {'X-Request-ID':rid}
-                if cfg.relay_backend=='groq':
-                    headers['Authorization'] = 'Bearer '+cfg.groq_api_key.get_secret_value()
-                payload = {'model':cfg.groq_model,'messages':messages,'stream':True,
-                           'max_completion_tokens':cap,'reasoning_effort':'low'}
-                content, usage, first, finish, chunks = '',None,None,None,0
-                safe_headers = {}
-                try:
-                    async with httpx.AsyncClient(timeout=httpx.Timeout(30,connect=8)) as client:
-                        async with client.stream('POST',endpoint,headers=headers,json=payload) as response:
-                            safe_headers = {k:v for k,v in response.headers.items() if k.startswith('x-ratelimit-') or k in ('retry-after','x-request-id')}
-                            self.store.event(rid,'provider_headers',call_id=cid,http_status=response.status_code,headers=safe_headers)
-                            if response.status_code != 200:
-                                retry = safe_headers.get('retry-after')
-                                delay = float(retry) if retry and retry.replace('.','',1).isdigit() else None
-                                if response.status_code==429:
-                                    self.cooldown_until=time.monotonic()+(delay or 60)
-                                raise ModelError('provider_http_error',response.status_code,delay)
-                            async for line in response.aiter_lines():
-                                if not line.startswith('data: '): continue
-                                raw = line[6:]
-                                if raw=='[DONE]': break
-                                obj=json.loads(raw)
-                                if obj.get('error'): raise ModelError('stream_error')
-                                usage = obj.get('usage') or obj.get('x_groq',{}).get('usage') or usage
-                                for choice in obj.get('choices',[]):
-                                    piece=choice.get('delta',{}).get('content') or ''
-                                    if piece:
-                                        first = first if first is not None else (time.perf_counter()-start)*1000
-                                        content+=piece
-                                        chunks+=1
-                                    finish=choice.get('finish_reason') or finish
-                    self.store.call_state(cid,'succeeded',usage)
-                    elapsed=(time.perf_counter()-start)*1000
-                    self.store.event(rid,'model_completed',call_id=cid,stage=stage,first_content_ms=first,total_ms=elapsed,usage=usage,finish_reason=finish,chunks=chunks)
-                    if not content or finish not in ('stop',):
-                        raise ModelError('incomplete_response')
-                    return {'text':content,'usage':usage,'headers':safe_headers,'first_model_token_ms':first,'total_ms':elapsed,'retries':attempt-1}
-                except asyncio.CancelledError:
-                    self.store.call_state(cid,'unknown')
-                    raise
-                except (httpx.HTTPError, json.JSONDecodeError, ModelError) as exc:
-                    code=exc.code if isinstance(exc,ModelError) else type(exc).__name__
-                    self.store.event(rid,'model_failed',call_id=cid,error_code=code)
-                    if code=='incomplete_response': raise
-                    self.store.call_state(cid,'unknown')
-                    # Retrying streams after content risks duplicate remote work; stop.
-                    retryable = not content and (not isinstance(exc,ModelError) or (exc.status is not None and exc.status>=500))
-                    if not retryable or attempt==3:
-                        raise ModelError(code,getattr(exc,'status',None),getattr(exc,'retry_after',None)) from None
-            await asyncio.sleep(min(2,0.5*2**(attempt-1)))
+        try: self.cfg.require_provider()
+        except ValueError: raise ModelError('missing_api_key') from None
+        if not isinstance(cap,int) or cap<1: raise ModelError('invalid_completion_cap')
+        if self.pending>=self.cfg.model_queue_limit+self.cfg.model_concurrency:
+            raise ModelError('model_queue_full',429)
+        self.pending+=1
+        try:
+            async with asyncio.timeout(self.cfg.model_deadline):
+                return await self._generate(rid,messages,stage,cap)
+        except TimeoutError: raise ModelError('model_deadline',408) from None
+        finally: self.pending-=1
+
+    async def _generate(self,rid,messages,stage,cap):
+        cfg=self.cfg; start=time.perf_counter(); waited=0.
+        estimate=sum(len(m['content'].encode())+32 for m in messages)+cap
+        limits=(cfg.groq_rpm,cfg.groq_tpm,cfg.groq_rpd,cfg.groq_tpd)
+        for attempt in range(1,cfg.model_max_attempts+1):
+            delay=max(0.,self.cooldown_until-time.monotonic(),self.store.cooldown(cfg.relay_backend))
+            if delay:
+                if waited+delay>=cfg.model_wait_budget: raise ModelError('provider_cooldown',429,delay)
+                await asyncio.sleep(delay); waited+=delay
+            queued=time.perf_counter()
+            try:
+                async with asyncio.timeout(max(0.,cfg.model_wait_budget-waited)):
+                    await self.slots.acquire()
+            except TimeoutError: raise ModelError('model_queue_deadline',408) from None
+            waited+=time.perf_counter()-queued
+            cid=None; dispatched=False; content=''; usage=None; first=None; finish=None; done=False; headers={}; chunks=0
+            retry=None
+            try:
+                # A sibling may have observed 429 while this call waited for a slot.
+                if self.cooldown_until>time.monotonic():
+                    raise ModelError('provider_cooldown',429,self.cooldown_until-time.monotonic())
+                try: cid=self.store.reserve(rid,cfg.relay_backend,estimate,limits)
+                except ValueError as exc:
+                    self.store.event(rid,'quota_rejected',reason_code=str(exc),source=cfg.relay_backend)
+                    raise ModelError(str(exc),429) from None
+                self.store.event(rid,'model_started',call_id=cid,stage=stage,attempt=attempt,
+                                 estimated_tokens=estimate,source=cfg.relay_backend,wait_ms=waited*1000)
+                self.store.call_state(cid,'dispatched'); dispatched=True
+                async for event in self.backend.stream(rid,messages,cap):
+                    if event.kind=='headers': headers=event.value
+                    elif event.kind=='content':
+                        first=first if first is not None else (time.perf_counter()-start)*1000
+                        content+=event.value; chunks+=1
+                        if len(content)>1_000_000: raise ModelError('response_too_large')
+                    elif event.kind=='usage':
+                        value=event.value
+                        if isinstance(value,dict) and all(type(value.get(k)) is int and value[k]>=0 for k in ('prompt_tokens','completion_tokens')): usage=value
+                    elif event.kind=='finish': finish=event.value
+                    elif event.kind=='done': done=True
+                if not done or not content or finish!='stop': raise ModelError('incomplete_response')
+                self.store.call_state(cid,'succeeded',usage)
+                elapsed=(time.perf_counter()-start)*1000
+                self.store.event(rid,'model_completed',call_id=cid,stage=stage,first_content_ms=first,
+                                 total_ms=elapsed,usage=usage,finish_reason=finish,chunks=chunks,headers=headers)
+                return {'text':content,'usage':usage,'headers':headers,'first_model_token_ms':first,
+                        'total_ms':elapsed,'retries':attempt-1,'wait_ms':waited*1000}
+            except ModelError as exc:
+                if cid: self.store.call_state(cid,'unknown' if dispatched else 'released',usage)
+                self.store.event(rid,'model_failed',call_id=cid,error_code=exc.code,http_status=exc.status,headers=headers)
+                if exc.status==429 and exc.code=='provider_http_error':
+                    self.cooldown_until=max(self.cooldown_until,time.monotonic()+(exc.retry_after if exc.retry_after is not None else 60))
+                    self.store.cooldown(cfg.relay_backend,exc.retry_after if exc.retry_after is not None else 60)
+                retryable=not content and (exc.code in ('transport_error','transport_timeout') or
+                    exc.code=='provider_http_error' and (exc.status==429 or exc.status>=500))
+                if not retryable or attempt==cfg.model_max_attempts: raise
+                retry=exc.retry_after if exc.status==429 and exc.retry_after is not None else min(2.,cfg.retry_base_delay*2**(attempt-1))*random.uniform(0.8,1.2)
+                if exc.status==429: retry=max(retry,self.cooldown_until-time.monotonic())
+                if waited+retry>=cfg.model_wait_budget or time.perf_counter()-start+retry>=cfg.model_deadline: raise
+            except BaseException:
+                if cid: self.store.call_state(cid,'unknown' if dispatched else 'released',usage)
+                raise
+            finally: self.slots.release()
+            self.store.event(rid,'retry_scheduled',attempt=attempt+1,delay_ms=retry*1000)
+            await asyncio.sleep(retry); waited+=retry
         raise ModelError('retry_exhausted')

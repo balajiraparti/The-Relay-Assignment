@@ -227,6 +227,12 @@ Transport retries for failed API requests remain governed by section 9.2; they d
 
 ### 6.7 Retrieval configurations to compare
 
+Implemented F04–F08 baseline: all settings use the same 200-token/30-overlap recursive index. R1 takes BM25 top 4 from 12 candidates. R2/R3 each fuse 12 lexical and 12 dense candidates, rerank at most 16 against the original question, and retain 5/6 respectively. Deterministic ties, exact offsets, model/tokenizer identities, per-candidate ranks/scores and stage timings are recorded. The larger chunk variants in the historical table below remain deferred experiments. Overlong embedding queries or reranker pairs fail explicitly instead of silently truncating evidence.
+
+Input SHA-256 values are pinned in data/corpus.lock.json; exact PDF version markers must also match. Durable audits retain extracted text/warnings, with no OCR or reconstructed equations. Index publication is atomic after checksums/mapping validation and retains old revisions. No extraction warnings is not proof of correct scientific layout.
+
+The F07 stand-in has isolated validated profiles, bounded workers/queue, seeded request-ID faults, arrival-count failure injection, quota refusal, load slowdown and incremental SSE. F08 uses one event-based HTTP adapter contract, at most three transport attempts, persistent source-specific budgets/cooldowns and conservative unknown usage. Slots are released during backoff. There are no retries after content or a completed/truncated candidate. Limits are configurable local safeguards, not newly measured provider limits; provider-reset reconciliation remains F09 work.
+
 | ID | Retrieval / chunking | Candidates -> evidence | Rerank | Why test it |
 | --- | --- | --- | --- | --- |
 | R1 | BM25 only; 300 tokens / 50 overlap | 6 -> 4 | no | Cheap lexical baseline. |

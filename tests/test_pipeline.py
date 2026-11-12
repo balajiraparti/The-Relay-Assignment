@@ -24,3 +24,20 @@ def test_unicode_citations_preserve_identity():
     assert validate_answer(answer,[{'id':cid}])
     assert not validate_answer(answer,[{'id':'b'*20}])
     assert normalize_citations('【not a source】')=='【not a source】'
+
+
+@pytest.mark.parametrize('http_status,expected',[(408,'timed_out'),(429,'rate_limited'),(503,'failed')])
+def test_gateway_outcome_maps_to_request_state(tmp_path,http_status,expected):
+    import asyncio
+    from types import SimpleNamespace
+    from relay.pipeline import Pipeline
+    from relay.backends import ModelError
+    from relay.store import Store
+    store=Store(tmp_path/'db'); rid,_=store.create('key','hash',{'question':'test'})
+    class Unavailable:
+        async def generate(self,*args,**kwargs): raise ModelError('fixture',http_status)
+    chunk={'id':'a'*20,'paper_id':'paper','version':1,'page':1,'text':'evidence'}
+    retriever=SimpleNamespace(revision='fixture',search=lambda *args:[chunk])
+    pipeline=Pipeline(SimpleNamespace(relay_backend='stand-in'),store,Unavailable(),retriever)
+    asyncio.run(pipeline.run(rid,{'question':'test','refinement':'off','retrieval_setting':'R2'}))
+    assert store.get(rid)['status']==expected

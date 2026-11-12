@@ -2,109 +2,183 @@ import hashlib
 import json
 import os
 import re
-from pathlib import Path
+import shutil
+import time
+import uuid
+from importlib.metadata import version
 import numpy as np
-from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from rank_bm25 import BM25Okapi
 from relay.config import ROOT
+from relay.extraction import PAPERS, canonical, checksum, extract, save_audit
+from relay.telemetry import current
 
-PAPERS = {'1706.03762':7, '2410.00037':1, '2507.07955':2}
 
-
-def tokens(text):
-    return re.findall(r'\w+', text.lower())
+def tokens(text): return re.findall(r'\w+',text.lower())
 
 
 def local_models(cfg, rerank=True):
-    os.environ.setdefault('HF_HOME', str(ROOT / '.cache' / 'huggingface'))
-    from sentence_transformers import SentenceTransformer, CrossEncoder
-    emb = SentenceTransformer(cfg.embedding_model, device='cpu')
-    cross = CrossEncoder(cfg.reranker_model, device='cpu') if rerank else None
-    return emb, cross
+    os.environ.setdefault('HF_HOME',str(ROOT/'.cache'/'huggingface'))
+    from sentence_transformers import SentenceTransformer,CrossEncoder
+    emb=SentenceTransformer(cfg.embedding_model,device='cpu')
+    return emb,CrossEncoder(cfg.reranker_model,device='cpu') if rerank else None
 
 
-def ingest(cfg, chunk_size=200, overlap=30):
-    """Page-wise recursive splitting; tokenizer cap prevents embedding truncation."""
-    model, _ = local_models(cfg, False)
-    size = min(chunk_size, model.max_seq_length-16)
-    if not 0 <= overlap < size:
-        raise ValueError('invalid_overlap')
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=size, chunk_overlap=overlap,
-        length_function=lambda s: len(model.tokenizer.encode(s, add_special_tokens=False)),
-        separators=['\n\n','\n',' ',''], add_start_index=True)
-    chunks, manifest, seen = [], [], set()
-    for path in sorted((ROOT/'data').glob('*.pdf')):
-        reader = PdfReader(path)
-        pages = [p.extract_text() or '' for p in reader.pages]
-        compact = re.sub(r'\s+', '', '\n'.join(pages[:2]))
-        found = [(pid,v) for pid,v in PAPERS.items() if f'{pid}v{v}' in compact]
-        if len(found) != 1:
-            raise ValueError(f'Exact arXiv version could not be verified for {path.name}')
-        pid, version = found[0]
-        if pid in seen:
-            raise ValueError('duplicate_paper')
-        seen.add(pid)
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        manifest.append({'paper_id':pid,'version':version,'sha256':digest,'file':path.name,'pages':len(pages)})
-        for page_no,text in enumerate(pages,1):
-            for doc in splitter.create_documents([text]):
-                start = doc.metadata['start_index']
-                cid = hashlib.sha256(f'{digest}:{page_no}:{start}:{doc.page_content}'.encode()).hexdigest()[:20]
-                chunks.append({'id':cid,'paper_id':pid,'version':version,'page':page_no,
-                               'offset':start,'text':doc.page_content})
-    if seen != set(PAPERS):
-        raise ValueError('Missing required paper')
-    matrix = model.encode([c['text'] for c in chunks], normalize_embeddings=True, show_progress_bar=True)
+def model_identity(model):
+    return {'max_seq_length':model.max_seq_length,
+            'tokenizer_sha256':hashlib.sha256(canonical(model.tokenizer.get_vocab())).hexdigest(),
+            'weights_sha256':weights_checksum(model),
+            'revision':getattr(model[0].auto_model.config,'_commit_hash',None)}
+
+
+def weights_checksum(model):
+    digest=hashlib.sha256()
+    for name,tensor in sorted(model.state_dict().items()):
+        digest.update(name.encode()); digest.update(str(tuple(tensor.shape)).encode())
+        digest.update(str(tensor.dtype).encode())
+        digest.update(tensor.detach().cpu().contiguous().numpy().tobytes())
+    return digest.hexdigest()
+
+
+def split_pages(audit,model,size,overlap):
+    if not 0 < size <= model.max_seq_length-16 or not 0 <= overlap < size:
+        raise ValueError('invalid_chunk_budget')
+    length=lambda text: len(model.tokenizer.encode(text,add_special_tokens=False,truncation=False))
+    splitter=RecursiveCharacterTextSplitter(chunk_size=size,chunk_overlap=overlap,
+        length_function=length,separators=['\n\n','\n',' ',''])
+    hashes={p['paper_id']:p['sha256'] for p in audit['papers']}
+    chunks=[]
+    for page in audit['pages']:
+        previous=-1
+        for text in splitter.split_text(page['text']):
+            # Library start_index mixes character offsets with token overlap.
+            start=page['text'].find(text,previous+1)
+            if start<0: raise ValueError('chunk_source_mapping_failed')
+            previous=start; count=length(text)
+            if count>size or len(model.tokenizer.encode(text,truncation=False))>model.max_seq_length:
+                raise ValueError('chunk_token_limit')
+            cid=hashlib.sha256(f"{hashes[page['paper_id']]}:{page['page']}:{start}:{text}".encode()).hexdigest()[:20]
+            chunks.append({'id':cid,'paper_id':page['paper_id'],'version':page['version'],
+                'page':page['page'],'offset':start,'end_offset':start+len(text),'tokens':count,'text':text})
+    if not chunks or len({c['id'] for c in chunks})!=len(chunks): raise ValueError('invalid_chunk_ids')
+    return chunks
+
+
+def load_artifacts(folder,revision):
     import faiss
-    index = faiss.IndexFlatIP(matrix.shape[1])
-    index.add(np.asarray(matrix,dtype='float32'))
-    cfg.runtime.mkdir(parents=True,exist_ok=True)
-    payload = {'papers':manifest,'embedding_model':cfg.embedding_model,'chunk_size':size,'overlap':overlap,'chunks':chunks}
-    revision = hashlib.sha256(json.dumps(payload,sort_keys=True).encode()).hexdigest()[:16]
-    folder = cfg.runtime/'indexes'/revision
-    folder.mkdir(parents=True,exist_ok=True)
-    (folder/'manifest.json').write_text(json.dumps(payload,ensure_ascii=False),encoding='utf-8')
-    faiss.write_index(index,str(folder/'vectors.faiss'))
-    (cfg.runtime/'active.tmp').write_text(revision,encoding='utf-8')
-    os.replace(cfg.runtime/'active.tmp',cfg.runtime/'active.txt')
-    return {'revision':revision,'papers':manifest,'chunks':len(chunks),'chunk_size_tokens':size}
+    raw=(folder/'manifest.json').read_bytes()
+    if hashlib.sha256(raw).hexdigest()[:16]!=revision: raise ValueError('manifest_checksum_mismatch')
+    data=json.loads(raw)
+    if data.get('schema_version')!=2: raise ValueError('index_schema_mismatch_reingest')
+    for name in ('vectors.faiss','keywords.json','pages.json'):
+        if checksum(folder/name)!=data['artifacts'][name]: raise ValueError('artifact_checksum_mismatch: '+name)
+    audit=json.loads((folder/'pages.json').read_bytes())
+    pages={(p['paper_id'],p['page']):p for p in audit['pages']}
+    chunks=data['chunks']
+    if not chunks or len({c['id'] for c in chunks})!=len(chunks): raise ValueError('chunk_mapping_mismatch')
+    for c in chunks:
+        page=pages[(c['paper_id'],c['page'])]
+        if c['offset']<0 or page['text'][c['offset']:c['end_offset']]!=c['text']:
+            raise ValueError('chunk_source_mapping_failed')
+    keywords=json.loads((folder/'keywords.json').read_bytes())
+    if keywords != [tokens(c['text']) for c in chunks]: raise ValueError('keyword_mapping_mismatch')
+    index=faiss.read_index(str(folder/'vectors.faiss'))
+    if index.ntotal!=len(chunks) or index.d!=data['dimensions']: raise ValueError('index_mapping_mismatch')
+    return data,index,keywords
+
+
+def ingest(cfg,chunk_size=200,overlap=30):
+    audit=extract(ROOT/'data'); save_audit(audit,cfg.runtime)
+    model,_=local_models(cfg,False)
+    size=min(chunk_size,model.max_seq_length-16)
+    chunks=split_pages(audit,model,size,overlap)
+    matrix=np.asarray(model.encode([c['text'] for c in chunks],normalize_embeddings=True,show_progress_bar=True),dtype='float32')
+    if matrix.ndim!=2 or not np.isfinite(matrix).all() or not np.allclose(np.linalg.norm(matrix,axis=1),1,atol=1e-4):
+        raise ValueError('invalid_embeddings')
+    import faiss
+    index=faiss.IndexFlatIP(matrix.shape[1]); index.add(matrix)
+    base=cfg.runtime/'indexes'; base.mkdir(parents=True,exist_ok=True)
+    temp=base/('.building-'+uuid.uuid4().hex); temp.mkdir()
+    try:
+        (temp/'pages.json').write_bytes(canonical(audit))
+        (temp/'keywords.json').write_bytes(canonical([tokens(c['text']) for c in chunks]))
+        faiss.write_index(index,str(temp/'vectors.faiss'))
+        payload={'schema_version':2,'papers':audit['papers'],'embedding_model':cfg.embedding_model,
+            'model_identity':model_identity(model),'chunk_size':size,'overlap':overlap,'chunks':chunks,
+            'dimensions':matrix.shape[1],'normalization':'l2',
+            'packages':{p:version(p) for p in ('pypdf','langchain-text-splitters','sentence-transformers','faiss-cpu')},
+            'artifacts':{name:checksum(temp/name) for name in ('pages.json','keywords.json','vectors.faiss')}}
+        raw=canonical(payload); revision=hashlib.sha256(raw).hexdigest()[:16]
+        (temp/'manifest.json').write_bytes(raw); load_artifacts(temp,revision)
+        destination=base/revision
+        if destination.exists(): load_artifacts(destination,revision)
+        else: temp.rename(destination)
+        pointer=cfg.runtime/('active-'+uuid.uuid4().hex+'.tmp')
+        pointer.write_text(revision,encoding='utf-8'); os.replace(pointer,cfg.runtime/'active.txt')
+        log=current()
+        if log: log.emit('index_published',index_revision=revision,chunks=len(chunks),pages=len(audit['pages']))
+        return {'revision':revision,'papers':audit['papers'],'chunks':len(chunks),'chunk_size_tokens':size,
+                'warnings':sum(len(p['warnings']) for p in audit['pages'])}
+    finally:
+        if temp.exists(): shutil.rmtree(temp)
+
+
+def fuse(rankings,limit=16):
+    scores={}
+    for ranking in rankings:
+        for rank,i in enumerate(dict.fromkeys(ranking),1):
+            if i>=0: scores[i]=scores.get(i,0)+1/(60+rank)
+    return sorted(scores,key=lambda i:(-scores[i],i))[:limit],scores
 
 
 class Retriever:
     def __init__(self,cfg):
-        import faiss
-        self.revision = (cfg.runtime/'active.txt').read_text().strip()
-        folder = cfg.runtime/'indexes'/self.revision
-        data = json.loads((folder/'manifest.json').read_text(encoding='utf-8'))
-        self.chunks, self.papers = data['chunks'], data['papers']
-        self.embedding, self.cross = local_models(cfg)
-        if data['embedding_model'] != cfg.embedding_model:
-            raise ValueError('embedding_model_mismatch')
-        self.index = faiss.read_index(str(folder/'vectors.faiss'))
-        if self.index.ntotal != len(self.chunks):
-            raise ValueError('index_mapping_mismatch')
-        self.bm25 = BM25Okapi([tokens(c['text']) for c in self.chunks])
+        self.revision=(cfg.runtime/'active.txt').read_text().strip()
+        if not re.fullmatch('[a-f0-9]{16}',self.revision): raise ValueError('invalid_index_revision')
+        data,self.index,keywords=load_artifacts(cfg.runtime/'indexes'/self.revision,self.revision)
+        if data['embedding_model']!=cfg.embedding_model: raise ValueError('embedding_model_mismatch')
+        self.chunks,self.papers=data['chunks'],data['papers']
+        self.embedding,self.cross=local_models(cfg)
+        self.reranker_identity={'model':cfg.reranker_model,'revision':getattr(self.cross.model.config,'_commit_hash',None),
+                               'weights_sha256':weights_checksum(self.cross.model)}
+        if data['model_identity']!=model_identity(self.embedding): raise ValueError('embedding_revision_mismatch')
+        self.bm25=BM25Okapi(keywords)
 
-    def search(self,question,query=None,setting='R2'):
-        query = query or question
-        count = min(12,len(self.chunks))
-        lexical = np.argsort(self.bm25.get_scores(tokens(query)))[::-1][:count].tolist()
-        if setting == 'R1':
-            chosen = lexical[:4]
+    def search(self,question,query=None,setting='R2',diagnostics=None):
+        if setting not in ('R1','R2','R3'): raise ValueError('invalid_retrieval_setting')
+        query=query or question
+        if not tokens(query): return []
+        if setting!='R1' and len(self.embedding.tokenizer.encode(query,truncation=False))>self.embedding.max_seq_length:
+            raise ValueError('query_input_too_long')
+        start=time.perf_counter(); count=min(12,len(self.chunks))
+        lexical_scores=self.bm25.get_scores(tokens(query))
+        lexical=sorted(range(len(self.chunks)),key=lambda i:(-lexical_scores[i],i))[:count]
+        lexical_ms=(time.perf_counter()-start)*1000
+        vector_ids=[]; scores={}; rerank_scores={}; vector_ms=0; rerank_ms=0
+        if setting=='R1': candidates=lexical; chosen=lexical[:4]
         else:
-            vector = self.embedding.encode([query],normalize_embeddings=True)
-            _, ids = self.index.search(np.asarray(vector,dtype='float32'),count)
-            scores = {}
-            for ranking in [lexical,ids[0].tolist()]:
-                for rank,i in enumerate(ranking,1):
-                    if i >= 0: scores[i] = scores.get(i,0)+1/(60+rank)
-            candidates = sorted(scores,key=scores.get,reverse=True)[:16]
-            pairs = [(question,self.chunks[i]['text']) for i in candidates]
-            # Refuse silent pair truncation, including long original questions.
-            if any(len(self.cross.tokenizer.encode(q,t)) > self.cross.max_length for q,t in pairs):
+            tick=time.perf_counter()
+            vector=self.embedding.encode([query],normalize_embeddings=True)
+            _,ids=self.index.search(np.asarray(vector,dtype='float32'),count)
+            vector_ids=[i for i in ids[0].tolist() if 0<=i<len(self.chunks)]
+            vector_ms=(time.perf_counter()-tick)*1000
+            candidates,scores=fuse([lexical,vector_ids])
+            pairs=[(question,self.chunks[i]['text']) for i in candidates]
+            cap=self.cross.max_length or self.cross.tokenizer.model_max_length
+            if any(len(self.cross.tokenizer.encode(q,t,truncation=False))>cap for q,t in pairs):
                 raise ValueError('reranker_input_too_long')
-            values = self.cross.predict(pairs)
-            chosen = [i for _,i in sorted(zip(values,candidates),reverse=True)][:5 if setting=='R2' else 6]
+            tick=time.perf_counter(); values=np.asarray(self.cross.predict(pairs)).reshape(-1)
+            if len(values)!=len(candidates) or not np.isfinite(values).all(): raise ValueError('invalid_reranker_scores')
+            rerank_scores=dict(zip(candidates,map(float,values)))
+            chosen=sorted(candidates,key=lambda i:(-rerank_scores[i],i))[:5 if setting=='R2' else 6]
+            rerank_ms=(time.perf_counter()-tick)*1000
+        detail={'setting':setting,'index_revision':self.revision,'bm25_ms':lexical_ms,'vector_ms':vector_ms,
+                'reranker_identity':getattr(self,'reranker_identity',None),
+                'rerank_ms':rerank_ms,'total_ms':(time.perf_counter()-start)*1000,
+                'candidates':[{'chunk_id':self.chunks[i]['id'],'bm25_rank':lexical.index(i)+1 if i in lexical else None,
+                    'vector_rank':vector_ids.index(i)+1 if i in vector_ids else None,'rrf_score':scores.get(i),
+                    'rerank_score':rerank_scores.get(i),'selected':i in chosen} for i in candidates]}
+        if diagnostics is not None: diagnostics.update(detail)
+        log=current()
+        if log: log.emit('retrieval_ranked',**detail)
         return [self.chunks[i] for i in chosen]

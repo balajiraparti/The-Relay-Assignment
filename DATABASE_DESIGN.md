@@ -20,6 +20,10 @@ Never hold a DB write transaction across HTTP/model calls, embedding computation
 
 ## 2. Shared conventions
 
+F04–F08 update: schema 3 adds provider_cooldowns keyed by real/stand-in source; atomic reservations check this persisted deadline. Startup recovers dispatched calls as unknown and releases only undispatched reservations. Known usage replaces estimates once per row; absent usage stays conservative. Cooldowns use UTC epoch values across restarts; local budgets remain conservative rolling windows, not claims about Groq reset semantics. Clock jumps remain a measurement caveat.
+
+Corpus persistence currently uses immutable, checksummed JSON artifacts rather than duplicating extracted text in SQLite: runtime/corpus contains audits; each index revision includes pages.json, keywords.json, vectors.faiss and manifest.json. These are authoritative for F04–F06 provenance. The relational corpus tables below remain a later materialization option; F04–F06 do not claim they exist. Old revision folders are retained for historical citations.
+
 Streamlit integration adds no UI database. It accesses SQLite only through FastAPI. Temporary UI state holds the API client, selected request, idempotency key and pagination cursors. Durable history, citations and runs live in SQLite. Browser refresh recovers via shared local history. No account, cookie or session-token persistence is needed.
 
 - UUIDs represented as canonical text; UTC times stored as INTEGER epoch milliseconds and converted at API boundaries. Durations are nonnegative REAL milliseconds measured using a process-local monotonic clock.

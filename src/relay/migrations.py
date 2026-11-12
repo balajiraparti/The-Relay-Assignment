@@ -3,7 +3,7 @@ import sqlite3
 import time
 from pathlib import Path
 
-VERSION=2
+VERSION=3
 BASELINE='''
 CREATE TABLE schema_version(version INTEGER PRIMARY KEY);
 INSERT INTO schema_version VALUES(1);
@@ -52,6 +52,12 @@ INSERT INTO schema_version VALUES(2);
 '''
 
 
+GATEWAY='''
+CREATE TABLE provider_cooldowns(source TEXT PRIMARY KEY CHECK(source IN ('groq','stand-in')), until REAL NOT NULL CHECK(until>=0));
+INSERT INTO schema_version VALUES(3);
+'''
+
+
 def check(db):
     if db.execute('PRAGMA integrity_check').fetchone()[0]!='ok' or db.execute('PRAGMA foreign_key_check').fetchall():
         raise RuntimeError('database_integrity_failed')
@@ -76,7 +82,7 @@ def migrate(path):
             finally: backup.close()
         # execute statements individually so DDL/copy/version update share one transaction.
         db.execute('BEGIN IMMEDIATE')
-        sql=(BASELINE if old==0 else '')+FOUNDATION
+        sql=(BASELINE if old==0 else '')+(FOUNDATION if old<2 else '')+(GATEWAY if old<3 else '')
         statement=''
         for line in sql.splitlines(keepends=True):
             statement+=line

@@ -3,6 +3,7 @@ import json
 import re
 import time
 from relay.gateway import ModelError
+from relay.telemetry import trace
 
 
 def parse_json(text):
@@ -55,7 +56,8 @@ class Pipeline:
                 self.stage(rid,'retrieving')
                 t=time.perf_counter()
                 async with self.local_slots:
-                    evidence=await asyncio.to_thread(self.retriever.search,question,query,body['retrieval_setting'])
+                    with trace(request_id=rid):
+                        evidence=await asyncio.to_thread(self.retriever.search,question,query,body['retrieval_setting'])
                 self.store.event(rid,'retrieval_completed',duration_ms=(time.perf_counter()-t)*1000,chunk_ids=[e['id'] for e in evidence],index_revision=self.retriever.revision)
                 if not evidence:
                     self.store.update(rid,'refused',{'message':'I could not find supporting evidence in the retrieved passages.'}); return
@@ -84,7 +86,7 @@ class Pipeline:
         except TimeoutError:
             self.store.update(rid,'timed_out',{'reason':'request_deadline'})
         except ModelError as e:
-            self.store.update(rid,'rate_limited' if e.status==429 else 'failed',{'reason':e.code,'http_status':e.status,'retry_after':e.retry_after})
+            self.store.update(rid,'rate_limited' if e.status==429 else 'timed_out' if e.status==408 else 'failed',{'reason':e.code,'http_status':e.status,'retry_after':e.retry_after})
         except Exception as e:
             self.store.update(rid,'failed',{'reason':type(e).__name__})
         finally:
