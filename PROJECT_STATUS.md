@@ -4,7 +4,7 @@ Last reviewed: November 12, 2026.
 
 ## Current state
 
-Version control: Git initialized with origin https://github.com/balajiraparti/The-Relay-Assignment.git. Main holds a minimal repository baseline; dev is the active development branch. Both remote branches exist. Project import is being committed/pushed on dev; future important completed features are committed and pushed there after checks. Pull-request merges remain separate. Secrets and generated runtime artifacts are excluded. This setup does not complete another product milestone.
+Version control: Git initialized with origin https://github.com/balajiraparti/The-Relay-Assignment.git. Main holds baseline f775d3b; dev contains project import b554b4a, successfully pushed to GitHub. Future important completed features are committed and pushed on dev after checks. Pull-request merges remain separate. Secrets and generated runtime artifacts are excluded. This setup does not complete another product milestone.
 
 **Phase: first runnable baseline; F01–F03 complete. Overall project is not complete.** The user authorized these three foundation features together. Their acceptance checks passed; remaining full-contract milestones remain partial or pending. Product/package version is 0.1.0, database schema version is 2. No hosted measurements were added in this work cycle.
 
