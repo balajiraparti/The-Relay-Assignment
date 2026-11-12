@@ -3,6 +3,7 @@ from typing import Literal
 from urllib.parse import urlsplit
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from relay.local_access import local_origin
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -32,11 +33,7 @@ class Settings(BaseSettings):
     @field_validator('relay_api_url','standin_url')
     @classmethod
     def local_url(cls, value):
-        url = urlsplit(value)
-        if url.scheme != 'http' or url.hostname not in ('127.0.0.1', 'localhost') or url.username or url.password or url.query or url.fragment or url.path not in ('', '/'):
-            raise ValueError('relay_api_url must be a local HTTP origin')
-        _ = url.port
-        return value.rstrip('/')
+        return local_origin(value)
 
     def require_provider(self):
         if self.relay_backend == 'groq' and not self.groq_api_key.get_secret_value().strip():

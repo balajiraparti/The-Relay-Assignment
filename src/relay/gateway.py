@@ -11,7 +11,7 @@ class Gateway:
         self.slots=asyncio.Semaphore(cfg.model_concurrency)
         self.cooldown_until=0.; self.pending=0
 
-    async def generate(self,rid,messages,stage='generation',cap=1024):
+    async def generate(self,rid,messages,stage='generation',cap=1024,response_format=None):
         try: self.cfg.require_provider()
         except ValueError: raise ModelError('missing_api_key') from None
         if not isinstance(cap,int) or cap<1: raise ModelError('invalid_completion_cap')
@@ -20,11 +20,11 @@ class Gateway:
         self.pending+=1
         try:
             async with asyncio.timeout(self.cfg.model_deadline):
-                return await self._generate(rid,messages,stage,cap)
+                return await self._generate(rid,messages,stage,cap,response_format)
         except TimeoutError: raise ModelError('model_deadline',408) from None
         finally: self.pending-=1
 
-    async def _generate(self,rid,messages,stage,cap):
+    async def _generate(self,rid,messages,stage,cap,response_format):
         cfg=self.cfg; start=time.perf_counter(); waited=0.
         estimate=sum(len(m['content'].encode())+32 for m in messages)+cap
         limits=(cfg.groq_rpm,cfg.groq_tpm,cfg.groq_rpd,cfg.groq_tpd)
@@ -52,7 +52,8 @@ class Gateway:
                 self.store.event(rid,'model_started',call_id=cid,stage=stage,attempt=attempt,
                                  estimated_tokens=estimate,source=cfg.relay_backend,wait_ms=waited*1000)
                 self.store.call_state(cid,'dispatched'); dispatched=True
-                async for event in self.backend.stream(rid,messages,cap):
+                options={'response_format':response_format} if response_format is not None else {}
+                async for event in self.backend.stream(rid,messages,cap,**options):
                     if event.kind=='headers': headers=event.value
                     elif event.kind=='content':
                         first=first if first is not None else (time.perf_counter()-start)*1000

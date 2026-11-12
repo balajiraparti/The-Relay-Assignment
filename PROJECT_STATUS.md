@@ -6,7 +6,7 @@ Last reviewed: November 13, 2026 (F04–F08 work began November 12).
 
 Version control: Git initialized with origin https://github.com/balajiraparti/The-Relay-Assignment.git. Main holds baseline f775d3b; dev contains project import b554b4a, successfully pushed to GitHub. Future important completed features are committed and pushed on dev after checks. Pull-request merges remain separate. Secrets and generated runtime artifacts are excluded. This setup does not complete another product milestone.
 
-**Phase: F01–F08 complete. Overall project is not complete.** F04–F08 were explicitly authorized and verified together. Product/package version remains 0.1.0; database schema is 3. No hosted measurements were added in this work cycle.
+**Phase: F01–F12 complete within their documented scope. Overall project is not complete.** F09–F12 were explicitly authorized and verified together. Product/package version remains 0.1.0; database schema is 3. This cycle made three bounded hosted calls, including one schema refusal retained in the results.
 
 Workspace now contains the Python package under src/relay, Streamlit UI, tests, README, dependency manifest and runtime evidence. Original PDFs and .env have been preserved. Version markers in all three PDFs matched the brief; SHA-256 checksums were recorded. Groq key presence and three successful real calls were verified without printing the key.
 
@@ -23,7 +23,7 @@ Workspace now contains the Python package under src/relay, Streamlit UI, tests, 
 | UI | Initial Streamlit screen verified | Prior health/form checks passed; current running state not asserted; full browser/interaction coverage pending |
 | Build tracking | Complete | This file and AGENTS.md |
 
-**Completed milestones: F01–F08 (8 of 16).** The final suite has 54 passing tests. This milestone count is not an effort percentage. Initial real measurements exist; answer-quality and load benchmarks are not complete.
+**Completed milestones: F01–F12 (12 of 16).** The final suite has 82 passing tests. This milestone count is not an effort percentage. Answer-quality and load benchmarks are not complete; a live citation-valid overstatement is explicitly retained for later grading.
 
 ## How to use this file
 
@@ -43,7 +43,7 @@ No feature silently adds paid services, replaces the selected architecture, rest
 
 ## Modular implementation backlog
 
-Current milestone states: F01–F08 Done; F09–F13 remain partial; F14 partial provider probe only; F15a has basic form verification; F15b/F15c and F16 pending. The table preserves full acceptance criteria.
+Current milestone states: F01–F12 Done; F13 partial; F14 partial provider probe only; F15a has basic form verification; F15b/F15c and F16 pending. The table preserves full acceptance criteria.
 
 | ID | Feature / boundary | Dependencies | Acceptance / demonstrable output |
 | --- | --- | --- | --- |
@@ -51,7 +51,7 @@ Current milestone states: F01–F08 Done; F09–F13 remain partial; F14 partial 
 | F02 | Structured telemetry: run/request IDs, JSON events, redaction, timings, bounded writer, shutdown flush | F01 | One traced fixture request; concurrent contexts stay separate; synthetic secrets redacted; write failure visible |
 | F03 | Persistence foundation: DB connection, migrations, repositories, transaction helpers | F01–02 | Fresh DB upgrades repeatably; FK/unique/check constraints reject invalid data; no provider calls while holding write transactions |
 | F04 | Corpus audit and extraction: version/checksum verification, page text and metadata | F01–03 | All three required versions verified; page provenance and extraction warnings stored; mismatch fails visibly |
-| F05 | Recursive text splitting and indexes: token-counted RecursiveCharacterTextSplitter, immutable chunk IDs, embeddings, FAISS and BM25 artifacts | F04 | Repeatable manifest; page/offset mapping and tokenizer limits checked; corrupted index blocks readiness; old revision retained; semantic chunking deferred |
+| F05 | Recursive text splitting and indexes: token-counted RecursiveCharacterTextSplitter, immutable chunk IDs, embeddings, FAISS and BM25 artifacts | fF04 | Repeatable manifest; page/offset mapping and tokenizer limits checked; corrupted index blocks readiness; old revision retained; semantic chunking deferred |
 | F06 | Hybrid retrieval and cross-encoder reranking | F05 | Bounded candidates, RRF fusion/deduplication and reranked evidence; fixture questions produce inspectable source chunks; timings logged |
 | F07 | Backend interface and controllable stand-in service | F01–02 | Common streaming/usage/error contract; deterministic fixture responses, delays, failures, 429s, worker queue slowdown and midstream interruption; initially uncalibrated |
 | F08 | Shared model gateway: quota reservations, daily counters, concurrency, deadlines, transport retries | F03, F07 | Concurrent reservations cannot overspend; retry waits release call slots; deadlines/cancellation respected; unknown remote usage stays conservative |
@@ -85,7 +85,18 @@ F09 has a real-service prerequisite; F07–08 can be implemented and tested with
 
 ## Next work item
 
-**Next: F09 real-provider adapter/calibration acceptance review.** Reuse the existing modest observations, review account/reset evidence and remaining calibration gaps before adding any live probes. No later milestone was started. F04–F08 are Done within the boundaries below; source PDFs, secrets, existing history and old indexes were preserved.
+**Next: F13 durable request API and resumable events.** F09–F12 are Done; F13–F16 were not implemented in this cycle. The API was started with the loopback-only launcher and readiness/UI-render checks passed; those checks do not imply full UI flows or ongoing provider availability.
+
+### F09–F12 completion evidence
+
+| Feature | Evidence | Verified scope / remaining limitations |
+| --- | --- | --- |
+| F09 | backends.py, calibration.py, cli.py, test_provider.py, docs/GROQ_LIMITS.md | Current live generic probe succeeded (996.8 ms); content-only stream, usage and allowlisted headers recorded. Original three-sample calibration validated with SHA-256 provenance. Published/observed quotas separated; actual RPM/TPD, sublimits, reset algorithm and high-load behaviour remain unknown. |
+| F10 | preparation.py, test_preparation.py, pipeline tests | Clear/off/busy bypass; missing-referent clarification; one bounded rewrite; prefix-only conservative intent guard; malformed/timeout/fault fallback. Original question retained for reranking/generation. No general semantic rewrite/decomposition claim. |
+| F11 | pipeline.py, store.py, test_pipeline.py, scripts/verify_live_rag.py | Single generation with JSON mode; sentence citation gates; safe refusal; all-attempt usage totals; cancelled retrieval retains worker capacity until completion. Live cited answer passed format checks; semantic overstatement documented rather than hidden or scored as correct. |
+| F12 | local_access.py, api.py, config.py, cli.py, ui/app.py, API tests | Loopback launcher; peer/Host/Origin/body checks; safe readiness; validated UI backend origin; no sign-in; shared local history. Real readiness 200 and Streamlit rendering passed. No public deployment or full browser validation. |
+
+See docs/F09_F12_VERIFICATION.md for measured successes/failures and evidence paths. Raw runtime/evaluation artifacts remain local and ignored by Git. No blocker remains for these four scoped milestones; F14 must measure semantic correctness and preserve the known novelty-overstatement example.
 
 ### F04–F08 completion evidence
 
@@ -129,6 +140,10 @@ The user explicitly requested a runnable initial version and real measurements i
 
 | Date | Scope | Check | Result |
 | --- | --- | --- | --- |
+| 2026-11-13 | F09–F12 regression | `.venv/Scripts/python.exe -m pytest -q` with loopback permission | 82 passed in 14.04 s; preparation, sentence citation/refusal, usage, Groq envelope and local-readiness checks plus prior regressions |
+| 2026-11-13 | F09 live probe/calibration | `relay.cli probe --count 1`; regenerate profile from original observations | 996.8 ms total, 974.2 ms first content, 82/42 tokens; old n=3 calibration retains paired delays plus source hash; no percentile claims |
+| 2026-11-13 | F11 real pipeline | CLI ask then explicit live evaluation after JSON-mode code change | First run refused invalid schema (14537.9 ms); separate revised run passed citation format (1967.6 ms, 1238/185 tokens); novelty overstatement retained for grading |
+| 2026-11-13 | F12 integration | `relay.cli serve`, HTTP readiness, Streamlit AppTest | Readiness 200, correct index/source and connectivity-not-probed label; UI render without exceptions |
 | 2026-11-12 | F04–F08 regression | `.venv/Scripts/python.exe -m pytest -q` with loopback permission | 54 passed in 16.95 s; includes 13 real loopback HTTP scenarios plus parser/unit/integration checks; no Groq calls |
 | 2026-11-12 | F04–F05 real corpus/reproducibility | `HF_HUB_OFFLINE=1` then `scripts/verify_index_build.py` | Two matching builds: 532f423d5a5967b8; 120 pages, 600 chunks; valid source spans; pinned source/tokenizer/weight/artifact hashes; old indexes retained; runtime/verification/index_build.json |
 | 2026-11-12 | F06 actual local models | `HF_HUB_OFFLINE=1` then `scripts/verify_retrieval.py` | 9/9 expected-paper and bounded-evidence checks across R1/R2/R3; runtime/verification/retrieval.json; not a quality benchmark |
@@ -151,6 +166,7 @@ Add feature-specific executed checks here; planned checks belong in the backlog 
 
 | Date | Change | Implementation impact |
 | --- | --- | --- |
+| 2026-11-13 | Completed F09–F12 with validated calibration, bounded preparation, sentence citation gate/JSON mode, aggregate usage and local readiness; aligned PRD/API/DB/README and evidence reports | F01–F12 Done; 82 tests pass; three hosted checks with failure retained; F13 next; no corrective loop or authentication |
 | 2026-11-12 | Completed F04–F08: audited corpus lock/pages, immutable checked indexes, retrieval diagnostics, backend event adapter, isolated stand-in, bounded gateway and schema-3 cooldowns; updated PRD/API/DB/README/examples | F01–F08 Done; 54 tests pass; real local corpus/model checks pass; no hosted load or fabricated results; F09 is next |
 | 2026-11-12 | Initialized Git, configured origin/main/dev and documented ongoing commit/push workflow in AGENTS.md | Reviewed 32 staged project files; configured Groq key absent; .env, caches, virtual environment and runtime evidence excluded; no product behaviour change |
 | 2026-11-12 | Audited/completed F01–F03; added telemetry.py and migrations.py, tightened config, wired API/CLI, added regression tests; aligned PRD/API/DB/README | F01–F03 Done; 24 passing tests; runtime schema 2 with verified backup; no new model calls; remaining milestones unchanged |

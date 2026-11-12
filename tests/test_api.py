@@ -15,7 +15,7 @@ class FakeRetriever:
 def client(tmp_path,monkeypatch):
     from relay.migrations import migrate
     migrate(tmp_path/'relay.db')
-    monkeypatch.setattr(api,'settings',lambda:Settings(_env_file=None,runtime=tmp_path))
+    monkeypatch.setattr(api,'settings',lambda:Settings(_env_file=None,runtime=tmp_path,relay_backend='stand-in'))
     monkeypatch.setattr(api,'Retriever',FakeRetriever)
     with TestClient(api.app) as client: yield client
 
@@ -47,3 +47,41 @@ def test_clarification_does_not_call_provider(client):
         if row['status']=='needs_clarification': break
         time.sleep(.01)
     assert row['status']=='needs_clarification'
+
+
+def test_readiness_origin_size_and_no_auth(client):
+    assert client.get('/health/ready').json()['provider_connectivity']=='not_probed'
+    assert client.post('/v1/requests',content=b'x'*17000).status_code==413
+    assert client.get('/health/live',headers={'origin':'https://untrusted.example'}).status_code==403
+    for path in ('/login','/logout','/v1/auth/login'):
+        assert client.get(path).status_code==404
+    assert client.get('/v1/capabilities').json()['authentication'] is False
+
+
+def test_remote_peer_cannot_spoof_host(tmp_path,monkeypatch):
+    from relay.migrations import migrate
+    migrate(tmp_path/'relay.db')
+    monkeypatch.setattr(api,'settings',lambda:Settings(_env_file=None,runtime=tmp_path,relay_backend='stand-in'))
+    monkeypatch.setattr(api,'Retriever',FakeRetriever)
+    with TestClient(api.app,client=('203.0.113.8',4567)) as client:
+        assert client.get('/health/live',headers={'host':'127.0.0.1','x-forwarded-for':'127.0.0.1'}).status_code==403
+
+
+@pytest.mark.parametrize('problem,expected',[('database','database_unavailable'),('key','provider_not_configured'),('index','index_or_models_unavailable')])
+def test_safe_unavailable_readiness(tmp_path,monkeypatch,problem,expected):
+    from relay.migrations import migrate
+    if problem!='database': migrate(tmp_path/'relay.db')
+    cfg=Settings(_env_file=None,runtime=tmp_path,groq_api_key='',relay_backend='groq' if problem=='key' else 'stand-in')
+    monkeypatch.setattr(api,'settings',lambda:cfg)
+    def broken(*args): raise ValueError('private path and secret must not leak')
+    monkeypatch.setattr(api,'Retriever',broken)
+    with TestClient(api.app) as client:
+        response=client.get('/health/ready')
+        assert response.status_code==503 and response.json()['detail']==expected
+        assert 'private' not in response.text
+        assert client.get('/health/live').status_code==200
+
+
+def test_history_is_shared_local_state(client):
+    row=client.post('/v1/requests',json={'question':'How does it work?'},headers={'Idempotency-Key':'shared-history-key'}).json()
+    assert row['id'] in [item['id'] for item in client.get('/v1/requests').json()['items']]

@@ -2,16 +2,19 @@ import os
 import uuid
 import httpx
 import streamlit as st
+from relay.local_access import local_origin
 
-API=os.getenv('RELAY_API_URL','http://127.0.0.1:8000')
 st.set_page_config(page_title='The Relay',page_icon='📄',layout='wide')
+try: API=local_origin(os.getenv('RELAY_API_URL','http://127.0.0.1:8000'))
+except ValueError:
+    st.error('Configure RELAY_API_URL as a local HTTP origin.'); st.stop()
 st.title('The Relay')
 st.caption('Ask about the three research papers. Answers use retrieved passages and citations.')
 
 
 def call(method,path,**kwargs):
     try:
-        with httpx.Client(timeout=10) as client:
+        with httpx.Client(timeout=10,trust_env=False) as client:
             r=client.request(method,API+path,**kwargs)
         if r.status_code>=400:
             st.error(f'Backend returned {r.status_code}: {r.json().get("detail","Request failed")}')

@@ -20,7 +20,7 @@ Use the existing `.env`, or copy `.env.example` manually and supply your key. Do
 Terminal 1:
 
 ```powershell
-.venv/Scripts/python.exe -m uvicorn relay.api:app --host 127.0.0.1 --port 8000
+.venv/Scripts/python.exe -m relay.cli serve
 ```
 
 Terminal 2:
@@ -68,8 +68,10 @@ The detailed design documents remain the target; this first slice is not their f
 - Conservative rolling 60-second/24-hour reservations, using a UTF-8 byte bound for input tokens; no account-reset reconciliation or separate ITPM/OTPM yet.
 - At most ten active API tasks. The gateway defaults to two simultaneous calls, ten queued calls, an eight-second cumulative slot/backoff wait budget per logical call, and a 45-second call deadline. The pipeline also has a 45-second overall deadline. End-to-end dispatcher fairness and separate user queue timing remain later API/load work.
 - All initial retrieval settings share the 200-token recursive index (30 target overlap) to fit the small embedding model; R1 is BM25 top 4, R2 hybrid/rerank top 5, R3 hybrid/rerank top 6. The proposed 500/700-token index variants are not implemented.
-- Preparation is heuristic: vague referent templates clarify; long questions can make one rewrite call. Full semantic intent-preservation checks and multi-query decomposition remain pending.
-- Citation validation checks allowed IDs and paragraph coverage; it cannot prove entailment or sentence-level grounding.
+- Preparation routes clear/off/busy queries without an LLM, clarifies known missing-referent patterns, and permits one optional five-second JSON rewrite. Only courtesy-prefix removal preserving substantive tokens/order is accepted; unsafe, malformed or failed rewrites use the original. General paraphrase equivalence and multi-query decomposition are not implemented.
+- Citation validation checks allowed IDs and sentence coverage. Malformed/unsupported answers refuse without regeneration. This is not semantic entailment: docs/F09_F12_VERIFICATION.md records an observed overbroad novelty claim despite valid citations.
 - Polling request API and Streamlit work first. SSE replay, signed cursors, exhaustive endpoint catalogue, retention, full experiment runner and submission tables remain pending.
 
 See PROJECT_STATUS.md for executed checks, measurements and the next incremental task. No UI metric should be reported as provider speed, and no fixture test should be reported as a real-service result.
+
+F09–F12 are verified: provider JSON mode, measured calibration with source hashes, conservative preparation, one-pass release/refusal, aggregate attempt usage and local access/readiness. See docs/GROQ_LIMITS.md for published versus observed quotas. Unknown usage makes request totals null while preserving known subtotals. The supported launcher binds loopback and disables proxy-header trust. Readiness checks configuration/storage/models, not remote connectivity. Local history is shared; there are no sign-in endpoints. An opt-in live evaluation script, `scripts/verify_live_rag.py`, makes one provider request and stores its draft separately under runtime/evaluation; ordinary operational logs exclude drafts.

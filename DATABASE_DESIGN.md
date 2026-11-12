@@ -20,6 +20,8 @@ Never hold a DB write transaction across HTTP/model calls, embedding computation
 
 ## 2. Shared conventions
 
+F09–F12 update (November 13): no schema migration is required; schema remains 3. Request totals are derived from the existing calls ledger for both preparation and generation attempts, excluding released reservations. If any attempted call has missing usage, total prompt/completion counts are null, with known subtotals and the unknown-call count retained. This prevents a successful final generation from hiding the cost of earlier preparation/retry work. Terminal results still use the existing first-writer-wins update. Drafts are omitted from ordinary logging; the explicit live evaluation script stores them only under runtime/evaluation.
+
 F04–F08 update: schema 3 adds provider_cooldowns keyed by real/stand-in source; atomic reservations check this persisted deadline. Startup recovers dispatched calls as unknown and releases only undispatched reservations. Known usage replaces estimates once per row; absent usage stays conservative. Cooldowns use UTC epoch values across restarts; local budgets remain conservative rolling windows, not claims about Groq reset semantics. Clock jumps remain a measurement caveat.
 
 Corpus persistence currently uses immutable, checksummed JSON artifacts rather than duplicating extracted text in SQLite: runtime/corpus contains audits; each index revision includes pages.json, keywords.json, vectors.faiss and manifest.json. These are authoritative for F04–F06 provenance. The relational corpus tables below remain a later materialization option; F04–F06 do not claim they exist. Old revision folders are retained for historical citations.

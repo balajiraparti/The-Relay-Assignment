@@ -12,6 +12,7 @@ from relay.gateway import Gateway
 from relay.corpus import Retriever
 from relay.pipeline import Pipeline
 from relay.telemetry import Telemetry
+from relay.local_access import local_peer,local_host
 
 
 class Ask(BaseModel):
@@ -31,14 +32,22 @@ class Ask(BaseModel):
 
 @asynccontextmanager
 async def service_lifespan(app):
-    cfg=settings(); store=Store(cfg.runtime/'relay.db',initialize=False); store.recover()
-    app.state.cfg=cfg; app.state.store=store; app.state.tasks={}
+    cfg=settings()
+    app.state.cfg=cfg; app.state.store=None; app.state.tasks={}
     app.state.ready_error=None; app.state.pipeline=None
     try:
+        store=Store(cfg.runtime/'relay.db',initialize=False); store.recover()
+        app.state.store=store
+    except Exception:
+        app.state.ready_error='database_unavailable'
+    try:
+        if app.state.store is None: raise RuntimeError('database_unavailable')
+        cfg.require_provider()
         retriever=await asyncio.to_thread(Retriever,cfg)
         app.state.pipeline=Pipeline(cfg,store,Gateway(cfg,store),retriever)
     except Exception as e:
-        app.state.ready_error=type(e).__name__
+        if app.state.ready_error is None:
+            app.state.ready_error='provider_not_configured' if str(e)=='missing_api_key' else 'index_or_models_unavailable'
     yield
     for task in list(app.state.tasks.values()): task.cancel()
     await asyncio.gather(*app.state.tasks.values(),return_exceptions=True)
@@ -58,14 +67,19 @@ app=FastAPI(title='The Relay',version='0.1.0',lifespan=lifespan)
 @app.middleware('http')
 async def local_guard(request: Request,call_next):
     from fastapi.responses import JSONResponse
-    host=request.headers.get('host','').split(':')[0]
-    if host not in ('127.0.0.1','localhost','testserver'):
+    if not request.client or not local_peer(request.client.host) or not local_host(request.headers.get('host','')):
         return JSONResponse({'error':{'code':'local_only'}},403)
     if request.headers.get('origin') and request.headers['origin'] not in ('http://localhost:8501','http://127.0.0.1:8501'):
         return JSONResponse({'error':{'code':'origin_rejected'}},403)
     if request.method=='POST':
-        body=await request.body()
-        if len(body)>16384: return JSONResponse({'error':{'code':'payload_too_large'}},413)
+        parts=[]; size=0
+        async for chunk in request.stream():
+            size+=len(chunk)
+            if size>16384: return JSONResponse({'error':{'code':'payload_too_large'}},413)
+            parts.append(chunk)
+        request._body=b''.join(parts)
+    if request.url.path.startswith('/v1/requests') and app.state.store is None:
+        return JSONResponse({'error':{'code':'database_unavailable'}},503)
     response=await call_next(request)
     response.headers['Cache-Control']='no-store'
     return response
@@ -77,8 +91,10 @@ def live(): return {'status':'alive'}
 
 @app.get('/health/ready')
 def ready():
-    if not app.state.pipeline: raise HTTPException(503,'index_or_models_unavailable: run ingestion first')
-    return {'status':'ready','source':app.state.cfg.relay_backend}
+    if app.state.telemetry.failed: raise HTTPException(503,'telemetry_unavailable')
+    if not app.state.pipeline: raise HTTPException(503,app.state.ready_error or 'not_ready')
+    return {'status':'ready','source':app.state.cfg.relay_backend,
+            'index_revision':app.state.pipeline.retriever.revision,'provider_connectivity':'not_probed'}
 
 
 @app.get('/v1/capabilities')
@@ -127,7 +143,7 @@ def get(rid:str):
 
 
 @app.post('/v1/requests/{rid}/cancel')
-def cancel(rid:str):
+async def cancel(rid:str):
     if not app.state.store.get(rid): raise HTTPException(404,'not_found')
     if app.state.store.update(rid,'cancelled',{'reason':'user_cancelled'}):
         task=app.state.tasks.get(rid)

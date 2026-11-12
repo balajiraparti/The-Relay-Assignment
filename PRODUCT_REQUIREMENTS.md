@@ -185,6 +185,8 @@ On malformed or timed-out preparation, use the original query if its intent is u
 
 ### 6.4 Hybrid retrieval and reranking contract
 
+F10 implementation clarification (November 13): the initial rewrite schema is `route` (direct/refine/clarify) plus `retrieval_query`; multi-query decomposition is deferred. Only courtesy-prefix removal that preserves substantive lexical order, numbers and negation passes the automatic guard. Original queries remain in request storage and generation/reranking, never operational logs. Missing-referent templates clarify without an LLM; clear/off/busy paths bypass it. Preparation has a five-second cap and safe original-query fallback. This supersedes broader automatic paraphrase assumptions above; arbitrary semantic equivalence is not guaranteed.
+
 For a question `q`, retrieve `K_vector` dense candidates and `K_bm25` lexical candidates. Fuse them using:
 
 ```text
@@ -220,6 +222,8 @@ The generation prompt must require all of the following:
 Grounding controls include bounded context, context-only prompting, citation-ID validation, and refusal on validation failure. Citation checks establish source identity and citation coverage, not semantic truth. Reranking and these checks cannot guarantee zero hallucinations; manual evidence grading measures remaining errors.
 
 ### 6.6 Single-pass release policy
+
+F11 implementation clarification: preparation and generation request provider JSON-object mode. Output is schema-checked and validated for known citations in each detected sentence; malformed or uncited drafts refuse without regeneration. Sentence splitting is conservative and may over-refuse complex notation. Citation identity/coverage still does not prove semantic entailment; the live novelty-overstatement example in docs/F09_F12_VERIFICATION.md must remain in later grading. Request usage aggregates all persisted attempts, including preparation; unknown usage is null with known subtotals exposed.
 
 Generate one candidate answer from the selected evidence pack. If evidence is absent, return an insufficient-evidence refusal; if citation validation fails, return a validation-failure refusal without claiming the papers definitively lack an answer. Log the selected chunks, validation result, and terminal reason. No answer-quality scores or corrective attempts are part of the runtime. Offline hand-grading remains required for the assignment.
 

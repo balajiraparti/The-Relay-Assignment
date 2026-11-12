@@ -30,16 +30,17 @@ def retry_seconds(value):
 
 
 class HTTPBackend:
-    def __init__(self,cfg): self.cfg=cfg
+    def __init__(self,cfg,transport=None): self.cfg,self.transport=cfg,transport
 
-    async def stream(self,rid,messages,cap):
+    async def stream(self,rid,messages,cap,response_format=None):
         cfg=self.cfg
         endpoint='https://api.groq.com/openai/v1/chat/completions' if cfg.relay_backend=='groq' else cfg.standin_url+'/v1/chat/completions'
         headers={'X-Request-ID':rid}
         if cfg.relay_backend=='groq': headers['Authorization']='Bearer '+cfg.groq_api_key.get_secret_value()
         payload={'model':cfg.groq_model,'messages':messages,'stream':True,'max_completion_tokens':cap,'reasoning_effort':'low'}
+        if response_format is not None: payload['response_format']=response_format
         try:
-            async with httpx.AsyncClient(timeout=httpx.Timeout(cfg.model_timeout,connect=min(8,cfg.model_timeout)),trust_env=False) as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(cfg.model_timeout,connect=min(8,cfg.model_timeout)),trust_env=False,transport=self.transport) as client:
                 async with client.stream('POST',endpoint,headers=headers,json=payload) as response:
                     safe={k:v for k,v in response.headers.items() if k.startswith('x-ratelimit-') or k in ('retry-after','x-request-id')}
                     yield BackendEvent('headers',safe)

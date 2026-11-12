@@ -124,6 +124,17 @@ class Store:
             row=db.execute('SELECT until FROM provider_cooldowns WHERE source=?',(source,)).fetchone()
             return max(0.,row['until']-time.time()) if row else 0.
 
+    def usage_summary(self,rid):
+        with self.connect() as db:
+            rows=db.execute("SELECT * FROM calls WHERE request_id=? AND state!='released'",(rid,)).fetchall()
+        known=[r for r in rows if r['tokens_in'] is not None and r['tokens_out'] is not None]
+        missing=len(rows)-len(known)
+        return {'prompt_tokens':sum(r['tokens_in'] for r in known) if not missing else None,
+                'completion_tokens':sum(r['tokens_out'] for r in known) if not missing else None,
+                'known_prompt_tokens':sum(r['tokens_in'] for r in known),
+                'known_completion_tokens':sum(r['tokens_out'] for r in known),
+                'unknown_usage_calls':missing,'attempts':len(rows)}
+
     def call_state(self, cid, state, usage=None):
         with self.connect() as db:
             db.execute('BEGIN IMMEDIATE')

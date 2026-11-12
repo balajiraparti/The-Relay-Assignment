@@ -12,7 +12,7 @@ from relay.gateway import Gateway, ModelError
 
 async def probe(cfg,count):
     """Small probe only; never intentionally floods or exhausts a provider quota."""
-    folder=cfg.runtime/'probes'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+    folder=cfg.runtime/'probes'/(datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid.uuid4().hex[:8])
     folder.mkdir(parents=True,exist_ok=True)
     store=Store(cfg.runtime/'relay.db'); gateway=Gateway(cfg,store)
     rows=[]
@@ -35,7 +35,7 @@ async def probe(cfg,count):
 
 def execute():
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=['check','audit','migrate','ingest','probe','ask','calibrate','export-events'])
+    parser.add_argument('command',choices=['check','serve','audit','migrate','ingest','probe','ask','calibrate','export-events'])
     parser.add_argument('--count',type=int,default=3)
     parser.add_argument('--question',default='How does Moshi support simultaneous listening and speaking?')
     parser.add_argument('--observations')
@@ -43,6 +43,9 @@ def execute():
     if args.command in ('probe','ask'): cfg.require_provider()
     if args.command=='check':
         print(json.dumps({'model':cfg.groq_model,'backend':cfg.relay_backend,'api_key_present':bool(cfg.groq_api_key.get_secret_value()),'index_present':(cfg.runtime/'active.txt').exists()}))
+    elif args.command=='serve':
+        import uvicorn
+        uvicorn.run('relay.api:app',host='127.0.0.1',port=8000,proxy_headers=False)
     elif args.command=='audit':
         from relay.extraction import extract,save_audit
         from relay.config import ROOT
@@ -73,13 +76,8 @@ def execute():
     elif args.command=='calibrate':
         from pathlib import Path
         if not args.observations: parser.error('--observations is required')
-        rows=json.loads(Path(args.observations).read_text(encoding='utf-8'))
-        good=[r for r in rows if r['status']=='ok' and r.get('source')=='groq' and r.get('first_token_ms') is not None]
-        if not good: parser.error('No successful real samples')
-        profile={'source_file':str(Path(args.observations).resolve()),'sample_count':len(good),
-                 'first_delay_samples_seconds':[r['first_token_ms']/1000 for r in good],
-                 'tail_samples_seconds':[(r['total_ms']-r['first_token_ms'])/1000 for r in good],
-                 'limitations':'Tiny generic-prompt sample; network/client setup mixed into timings. Does not estimate RAG latency, provider contention, failure probability or token-dependent generation speed.'}
+        from relay.calibration import calibrate
+        profile=calibrate(args.observations)
         (cfg.runtime/'calibration.json').write_text(json.dumps(profile,indent=2),encoding='utf-8')
         print(json.dumps(profile,indent=2))
     else:
