@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+runtime/
+runs/
+.cache/
+.codex/
+.agents/
+*.db
+*.db-wal
+*.db-shm
+*.bak
