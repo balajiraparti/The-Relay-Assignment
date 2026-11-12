@@ -14,17 +14,23 @@ async def probe(cfg,count):
     """Small probe only; never intentionally floods or exhausts a provider quota."""
     folder=cfg.runtime/'probes'/(datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid.uuid4().hex[:8])
     folder.mkdir(parents=True,exist_ok=True)
+    # A calibration smoke probe must not hide retries inside one observation.
+    cfg=cfg.model_copy(update={'model_max_attempts':1})
     store=Store(cfg.runtime/'relay.db'); gateway=Gateway(cfg,store)
     rows=[]
     for i in range(count):
         rid=str(uuid.uuid4()); start=time.perf_counter()
         store.operation(rid)
-        row={'request_id':rid,'source':cfg.relay_backend,'scenario':'modest_provider_probe','start_time':datetime.now(timezone.utc).isoformat(),'first_token_ms':None,'total_ms':None,'status':'error','tokens_in':None,'tokens_out':None}
+        row={'request_id':rid,'source':cfg.relay_backend,'model':cfg.groq_model,'scenario':'modest_provider_probe','measurement_version':2,
+             'timing_scope':'gateway submission through streamed completion; includes client/network and local admission; not UI TTFT',
+             'max_attempts':1,'start_time':datetime.now(timezone.utc).isoformat(),'first_token_ms':None,'total_ms':None,'status':'error','http_status':None,'tokens_in':None,'tokens_out':None}
         try:
             result=await gateway.generate(rid,[{'role':'user','content':'In one short sentence, explain what a citation identifies.'}],cap=256)
-            row.update(first_token_ms=result['first_model_token_ms'],total_ms=result['total_ms'],status='ok',tokens_in=(result['usage'] or {}).get('prompt_tokens'),tokens_out=(result['usage'] or {}).get('completion_tokens'),headers=result['headers'])
+            row.update(first_token_ms=result['first_model_token_ms'],total_ms=result['total_ms'],status='ok',http_status=result['http_status'],tokens_in=(result['usage'] or {}).get('prompt_tokens'),tokens_out=(result['usage'] or {}).get('completion_tokens'),headers=result['headers'],retries=result['retries'],wait_ms=result['wait_ms'])
         except ModelError as exc:
-            row.update(status='rate_limited' if exc.status==429 else 'error',error_code=exc.code,http_status=exc.status,total_ms=(time.perf_counter()-start)*1000)
+            row.update(status='rate_limited' if exc.status==429 else 'error',error_code=exc.code,local_status=exc.status,
+                       http_status=exc.status if exc.code=='provider_http_error' else None,
+                       retry_after_seconds=exc.retry_after,recovery_delay_measured_seconds=None,total_ms=(time.perf_counter()-start)*1000)
         rows.append(row)
         (folder/'observations.json').write_text(json.dumps(rows,indent=2),encoding='utf-8')
         print(json.dumps({'probe':i+1,'status':row['status'],'total_ms':row['total_ms']}))

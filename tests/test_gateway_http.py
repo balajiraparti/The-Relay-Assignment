@@ -60,6 +60,7 @@ def test_stream_events_and_usage(service,tmp_path):
         cfg,store,gateway=setup(tmp_path,url)
         request=rid(store)
         result=asyncio.run(gateway.generate(request,MESSAGES))
+        assert result['http_status']==200
         assert result['retries']==0 and result['usage']['completion_tokens']>0
         assert 'Synthetic' in result['text']
         with store.connect() as db: assert db.execute('SELECT state FROM calls').fetchone()[0]=='succeeded'

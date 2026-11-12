@@ -42,6 +42,7 @@ class HTTPBackend:
         try:
             async with httpx.AsyncClient(timeout=httpx.Timeout(cfg.model_timeout,connect=min(8,cfg.model_timeout)),trust_env=False,transport=self.transport) as client:
                 async with client.stream('POST',endpoint,headers=headers,json=payload) as response:
+                    yield BackendEvent('http_status',response.status_code)
                     safe={k:v for k,v in response.headers.items() if k.startswith('x-ratelimit-') or k in ('retry-after','x-request-id')}
                     yield BackendEvent('headers',safe)
                     if response.status_code!=200:

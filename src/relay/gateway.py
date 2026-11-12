@@ -39,7 +39,7 @@ class Gateway:
                     await self.slots.acquire()
             except TimeoutError: raise ModelError('model_queue_deadline',408) from None
             waited+=time.perf_counter()-queued
-            cid=None; dispatched=False; content=''; usage=None; first=None; finish=None; done=False; headers={}; chunks=0
+            cid=None; dispatched=False; content=''; usage=None; first=None; finish=None; done=False; headers={}; chunks=0; http_status=None
             retry=None
             try:
                 # A sibling may have observed 429 while this call waited for a slot.
@@ -54,7 +54,8 @@ class Gateway:
                 self.store.call_state(cid,'dispatched'); dispatched=True
                 options={'response_format':response_format} if response_format is not None else {}
                 async for event in self.backend.stream(rid,messages,cap,**options):
-                    if event.kind=='headers': headers=event.value
+                    if event.kind=='http_status': http_status=event.value
+                    elif event.kind=='headers': headers=event.value
                     elif event.kind=='content':
                         first=first if first is not None else (time.perf_counter()-start)*1000
                         content+=event.value; chunks+=1
@@ -68,12 +69,12 @@ class Gateway:
                 self.store.call_state(cid,'succeeded',usage)
                 elapsed=(time.perf_counter()-start)*1000
                 self.store.event(rid,'model_completed',call_id=cid,stage=stage,first_content_ms=first,
-                                 total_ms=elapsed,usage=usage,finish_reason=finish,chunks=chunks,headers=headers)
+                                 total_ms=elapsed,usage=usage,finish_reason=finish,chunks=chunks,headers=headers,http_status=http_status)
                 return {'text':content,'usage':usage,'headers':headers,'first_model_token_ms':first,
-                        'total_ms':elapsed,'retries':attempt-1,'wait_ms':waited*1000}
+                        'total_ms':elapsed,'retries':attempt-1,'wait_ms':waited*1000,'http_status':http_status}
             except ModelError as exc:
                 if cid: self.store.call_state(cid,'unknown' if dispatched else 'released',usage)
-                self.store.event(rid,'model_failed',call_id=cid,error_code=exc.code,http_status=exc.status,headers=headers)
+                self.store.event(rid,'model_failed',call_id=cid,error_code=exc.code,http_status=http_status,local_status=exc.status,headers=headers)
                 if exc.status==429 and exc.code=='provider_http_error':
                     self.cooldown_until=max(self.cooldown_until,time.monotonic()+(exc.retry_after if exc.retry_after is not None else 60))
                     self.store.cooldown(cfg.relay_backend,exc.retry_after if exc.retry_after is not None else 60)

@@ -348,6 +348,8 @@ Use a bounded writer queue (initially 10,000 events). Under ordinary development
 
 ### 7.5 Metrics and logging acceptance checks
 
+Measurement readiness decision (November 13): prioritize a real-service experiment before further stand-in calibration. The current probe remains a small readiness tool, not the F14 benchmark. It records explicit upstream status and disables hidden retries. Keep local quota rejection separate from remote 429, gateway/client timings separate from provider compute/UI delivery, and Retry-After separate from empirical recovery. The proposed larger run and required manifest/attempt records are in docs/REAL_SERVICE_READINESS.md; none of its planned percentile or recovery results is claimed as measured.
+
 - A request ID reconstructs arrival, waits, refinement if any, retrieval, reranking, all provider attempts, validation, and completion.
 - Each outbound attempt has its own call/attempt identity; optional refinement and transport retries contribute to total request usage. Missing provider usage is null/unknown, never silently zero.
 - A single finalizer produces one terminal request record; the exporter deduplicates by run/request ID. Arrival reconciliation detects missing summaries and orphan spans.

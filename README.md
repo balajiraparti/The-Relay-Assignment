@@ -35,6 +35,8 @@ Try: "How does Moshi support simultaneous listening and speaking?" Inspect the a
 
 ## Safe small measurements
 
+See docs/REAL_SERVICE_READINESS.md before a larger measurement run. The logger and live Groq path are verified, but the existing 1–5-call probe is not a percentile/recovery runner. Probe measurement version 2 disables retries, explicitly records upstream HTTP status and distinguishes local rejection from provider status. N=1 or N=3 cannot establish useful tail percentiles. Further stand-in calibration should follow a separately recorded real experiment.
+
 ```powershell
 .venv/Scripts/python.exe -m relay.cli probe --count 3
 .venv/Scripts/python.exe -m relay.cli export-events

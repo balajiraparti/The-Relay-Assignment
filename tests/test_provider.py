@@ -20,6 +20,7 @@ def test_groq_contract_content_only_usage_and_headers():
     cfg=Settings(_env_file=None,groq_api_key='synthetic-secret')
     async def run(): return [e async for e in HTTPBackend(cfg,httpx.MockTransport(handle)).stream('r',[{'role':'user','content':'q'}],10)]
     events=asyncio.run(run())
+    assert next(e.value for e in events if e.kind=='http_status')==200
     assert [e.value for e in events if e.kind=='content']==['answer']
     assert next(e.value for e in events if e.kind=='usage')['prompt_tokens']==10
     assert next(e.value for e in events if e.kind=='headers')=={'x-ratelimit-limit-tokens':'8000'}

@@ -85,7 +85,9 @@ F09 has a real-service prerequisite; F07–08 can be implemented and tested with
 
 ## Next work item
 
-**Next: F13 durable request API and resumable events.** F09–F12 are Done; F13–F16 were not implemented in this cycle. The API was started with the loopback-only launcher and readiness/UI-render checks passed; those checks do not imply full UI flows or ongoing provider availability.
+**Readiness audit complete (November 13).** Logger and Groq are verified for controlled probes. F09 measurement hardening now records explicit successful upstream status, disables probe retries and separates local/provider errors. One real call returned 200 with 660.9 ms TTFT, 799.9 ms total and 82/26 tokens; matching JSONL was verified. No real 429 or recovery was measured. The full percentile/recovery runner remains F14 work. User priority: collect real evidence before further stand-in calibration; see docs/REAL_SERVICE_READINESS.md.
+
+**Next proposed priority: a bounded real-service measurement runner before further stand-in calibration.** This readiness audit did not implement the full F14 runner. F13 durable request API/resumable events and the remaining F14–F16 work stay pending. Earlier API readiness/UI-render checks do not imply full UI flows or ongoing provider availability.
 
 ### F09–F12 completion evidence
 
@@ -140,6 +142,7 @@ The user explicitly requested a runnable initial version and real measurements i
 
 | Date | Scope | Check | Result |
 | --- | --- | --- | --- |
+| 2026-11-13 | Real-service readiness audit | Focused telemetry/provider/gateway tests; `relay.cli probe --count 1`; correlate observation and JSONL by request ID | 21 tests passed in 6.80 s; real HTTP 200, TTFT 660.9 ms, total 799.9 ms, 82/26 tokens, zero retries; no 429/recovery evidence; larger percentile run not executed |
 | 2026-11-13 | F09–F12 regression | `.venv/Scripts/python.exe -m pytest -q` with loopback permission | 82 passed in 14.04 s; preparation, sentence citation/refusal, usage, Groq envelope and local-readiness checks plus prior regressions |
 | 2026-11-13 | F09 live probe/calibration | `relay.cli probe --count 1`; regenerate profile from original observations | 996.8 ms total, 974.2 ms first content, 82/42 tokens; old n=3 calibration retains paired delays plus source hash; no percentile claims |
 | 2026-11-13 | F11 real pipeline | CLI ask then explicit live evaluation after JSON-mode code change | First run refused invalid schema (14537.9 ms); separate revised run passed citation format (1967.6 ms, 1238/185 tokens); novelty overstatement retained for grading |
@@ -166,6 +169,7 @@ Add feature-specific executed checks here; planned checks belong in the backlog 
 
 | Date | Change | Implementation impact |
 | --- | --- | --- |
+| 2026-11-13 | Hardened probe measurement metadata and explicit upstream status; verified live JSONL; added real-service readiness report and experiment prerequisites | F09 follow-up only; no additional milestone completed, no stand-in changes or percentile claims; future calibration follows real observations |
 | 2026-11-13 | Completed F09–F12 with validated calibration, bounded preparation, sentence citation gate/JSON mode, aggregate usage and local readiness; aligned PRD/API/DB/README and evidence reports | F01–F12 Done; 82 tests pass; three hosted checks with failure retained; F13 next; no corrective loop or authentication |
 | 2026-11-12 | Completed F04–F08: audited corpus lock/pages, immutable checked indexes, retrieval diagnostics, backend event adapter, isolated stand-in, bounded gateway and schema-3 cooldowns; updated PRD/API/DB/README/examples | F01–F08 Done; 54 tests pass; real local corpus/model checks pass; no hosted load or fabricated results; F09 is next |
 | 2026-11-12 | Initialized Git, configured origin/main/dev and documented ongoing commit/push workflow in AGENTS.md | Reviewed 32 staged project files; configured Groq key absent; .env, caches, virtual environment and runtime evidence excluded; no product behaviour change |
