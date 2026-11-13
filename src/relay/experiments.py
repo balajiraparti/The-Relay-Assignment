@@ -84,7 +84,7 @@ def export(folder,allow_incomplete=False):
 
 async def quality(cfg,selected,interval):
     from relay.corpus import Retriever
-    questions_path=ROOT/'data/evaluation_questions.json'
+    questions_path=ROOT/'data/evaluation_questions.v1.json'
     questions=json.loads(questions_path.read_text(encoding='utf-8'))
     cfg.require_provider()
     store=Store(cfg.runtime/'relay.db'); retriever=await asyncio.to_thread(Retriever,cfg)

@@ -31,4 +31,7 @@ assert before==((base/'tables.json').read_bytes(),(base/'TABLES.md').read_bytes(
 assert len(PdfReader(ROOT/'output/pdf/The_Relay_Assignment_Report.pdf').pages)==2
 questions={raw[row['request_id']]['question_id'] for row in rows if row['source']=='real'}
 assert len(questions)>=15
+frozen=ROOT/'data/evaluation_questions.v1.json'
+quality_manifest=json.loads((base/'4bbf5470-b3b6-45fd-957e-16a01dc24aff/manifest.json').read_text())
+assert hashlib.sha256(frozen.read_bytes()).hexdigest()==quality_manifest['question_sha256']
 print(f'PASS: {len(rows)} unique CSV rows match raw records; {len(questions)} questions; tables reproduce byte-for-byte; hashes valid; report is two pages.')

@@ -27,6 +27,8 @@ The report generator uses these headings and creates exactly two pages. The brie
 
 ## Reproduction
 
+The measured question set is frozen at `data/evaluation_questions.v1.json` and its SHA matches the run manifest. The author's live edits to `data/evaluation_questions.json` are a separate working draft and were not part of these results. Packaging reads committed Git blobs, not uncommitted working drafts, so simultaneous editing cannot silently alter a submission artifact.
+
 Use Python 3.11 and the pinned `requirements.lock.txt` for the measured Windows environment, then install the repository editable without resolving dependencies again. Preserve or recreate `.env` privately; audit/ingest the pinned source PDFs; migrate before starting the API. The local model files are pinned by recorded weight/tokenizer hashes, not bundled in the submission. Download access is required on a clean machine.
 
 Run `python -m relay.experiments quality --interval 30` for a new 45-arrival real experiment. It uses the shared persistent quota ledger, so do not reset the DB to bypass limits. Run it without concurrent interactive hosted traffic. Run `python -m relay.experiments load` for synthetic profiles. Both save new UUID run directories, never overwrite prior raw trials. Quality runs may take more than twenty minutes and consume account tokens. `--scenario` limits the synthetic runner to named scenarios; it does not select real traffic.

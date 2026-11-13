@@ -4,6 +4,8 @@ Last reviewed: November 13, 2026 (F04–F08 work began November 12).
 
 ## Current state
 
+**Final reproducibility follow-up:** simultaneous author edits added unmeasured Q16/Q17 to the working question file. Those edits are preserved locally. The runner now uses `data/evaluation_questions.v1.json`, verified byte-for-byte against the actual 15-question run SHA. The committed baseline question file is restored to the measured set through the index without overwriting the author's working file. Packaging reads committed blobs only. Draft PR: https://github.com/balajiraparti/The-Relay-Assignment/pull/1. Author edits are intentionally left unstaged.
+
 **Active cycle: F13–F16 (November 13).** F13 and F15 implemented and verified; F14 experiment execution/export implemented with author grade verification pending; F16 report/package implementation with final author feedback/reflection pending. The user explicitly authorized all four milestones and asked to leave Vaani feedback until the end. No user opinion is invented.
 
 Version control: Git initialized with origin https://github.com/balajiraparti/The-Relay-Assignment.git. Main holds baseline f775d3b; dev contains project import b554b4a, successfully pushed to GitHub. Future important completed features are committed and pushed on dev after checks. Pull-request merges remain separate. Secrets and generated runtime artifacts are excluded. This setup does not complete another product milestone.
