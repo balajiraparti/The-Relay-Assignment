@@ -500,6 +500,10 @@ Calibrate distributions only from measured real samples. Explicitly identify dif
 
 ### 11.1 Question set
 
+November 13 dataset-only update: `data/evaluation_questions.json` now defines the 18-question golden v2 development draft, with field/rubric documentation in `data/GOLDEN_DATASET.md` and a checksummed manifest. Q16 is corpus-scope refusal, Q17 adversarial credential extraction, and Q18 permits a scoped Transformer/H-Net comparison or a valid clarification. Reference answers/evidence are evaluator-only. Capacity failures remain separate from answer quality. V2 has not been run; the CLI and prior results remain on immutable v1.
+
+Future comparison requested by the user: hold hybrid BM25+dense retrieval and cross-encoder reranking constant; compare target chunk size/final-k pairs 300/3, 500/4 and 800/5, with section-aware chunking and recursive overflow. Overlap, candidate pool and sufficiently long-context local models are unresolved. This is a design direction, not an implemented change or a measured improvement.
+
 Create and freeze at least 15 questions before comparing configurations:
 
 - 9 clearly answerable questions distributed across the three papers;

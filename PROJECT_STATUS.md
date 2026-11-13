@@ -4,7 +4,9 @@ Last reviewed: November 13, 2026 (F04–F08 work began November 12).
 
 ## Current state
 
-**Final reproducibility follow-up:** simultaneous author edits added unmeasured Q16/Q17 to the working question file. Those edits are preserved locally. The runner now uses `data/evaluation_questions.v1.json`, verified byte-for-byte against the actual 15-question run SHA. The committed baseline question file is restored to the measured set through the index without overwriting the author's working file. Packaging reads committed blobs only. Draft PR: https://github.com/balajiraparti/The-Relay-Assignment/pull/1. Author edits are intentionally left unstaged.
+**Golden dataset v2 preparation: Done (artifact remains an author-review draft).** Updated all 18 questions, preserved the author's wording and original expectations, added reference evidence and grading criteria. No retrieval, chunking, provider or runner code changed; v1 and previous measurements are unchanged. V2 has not been executed. Next task: author review of labels/ambiguity policy, then a separately authorized implementation cycle for section-aware chunking and fixed hybrid/reranked comparisons.
+
+**Reproducibility:** the runner uses `data/evaluation_questions.v1.json`, verified byte-for-byte against the actual 15-question run SHA. The author's subsequent Q16–Q18 additions are now incorporated into the separate v2 working dataset with original wording retained. Packaging reads committed blobs only. Draft PR: https://github.com/balajiraparti/The-Relay-Assignment/pull/1. Existing packaged reports still describe v1; they were not regenerated for this unexecuted dataset.
 
 **Active cycle: F13–F16 (November 13).** F13 and F15 implemented and verified; F14 experiment execution/export implemented with author grade verification pending; F16 report/package implementation with final author feedback/reflection pending. The user explicitly authorized all four milestones and asked to leave Vaani feedback until the end. No user opinion is invented.
 
@@ -181,6 +183,12 @@ The user explicitly requested a runnable initial version and real measurements i
 Add feature-specific executed checks here; planned checks belong in the backlog until run.
 
 ## Change log
+
+### November 13 — golden dataset v2 only
+
+Changed: `data/evaluation_questions.json`, `data/evaluation_questions.manifest.json`, `data/GOLDEN_DATASET.md`, PRD, DB design and tracker. Q16 covers corpus scope, Q17 adversarial credential disclosure, Q18 a scoped two-paper comparison or warranted clarification. No runtime changes or hosted calls. Proposed future section-aware 300/3, 500/4, 800/5 comparisons share hybrid retrieval and reranking; overlap/model capacities remain open.
+
+Verification actually executed: read-only Python validation checked 18 unique IDs, exact preservation of all author questions/expectations, required fields, 16 exact page-text locators, the three pinned PDF hashes, dataset SHA, null grades/unexecuted states, Q17/Q18 policies and byte-identical v1 versus Git. All passed. Source references are extraction-checked, not independently human-verified; out-of-scope labels and Q18 alternatives require author review. No app test rerun was needed for this dataset/documentation-only change. This does not close the existing real concurrency/429/recovery or final author-review gaps.
 
 ### November 13 F13–F16 verification ledger supplement
 

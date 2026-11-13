@@ -1,0 +1,63 @@
+{
+  "dataset_id": "relay-golden-v2",
+  "schema_version": 2,
+  "status": "draft_requires_author_review",
+  "question_file": "data/evaluation_questions.json",
+  "question_count": 18,
+  "question_sha256": "96a187f8d258c7a07bb9cae6ddaa2047a5733e530d5fb7463f5ea8dbc55df111",
+  "previous_dataset": "data/evaluation_questions.v1.json",
+  "previous_dataset_sha256": "454a919ce151e8ad064cbf460c3cb372f98897dafdc00fb8793346d0148ba211",
+  "corpus": [
+    {
+      "file": "attention is what you need.pdf",
+      "pages": 15,
+      "paper_id": "1706.03762",
+      "sha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697",
+      "version": 7
+    },
+    {
+      "file": "dynamic chunking.pdf",
+      "pages": 39,
+      "paper_id": "2507.07955",
+      "sha256": "04a2b32e6e82853cfc23c5db132750874a86cde99219ec6f664128f4aa83122f",
+      "version": 2
+    },
+    {
+      "file": "Moshi.pdf",
+      "pages": 66,
+      "paper_id": "2410.00037",
+      "sha256": "a687144cc77bea86b0c60ae800ccb1d3e0816033fa5c7960388fe29a0dbfcfac",
+      "version": 1
+    }
+  ],
+  "reference_extraction_revision": "532f423d5a5967b8",
+  "execution_status": "not_run; current CLI still uses frozen v1",
+  "leakage_policy": "Only question text is sent to the answering pipeline. Gold answers, rubric and evidence locators are evaluator-only.",
+  "evaluation_scope": "Development set; Q01-Q15 were already inspected during earlier experiments. This is not an unseen holdout.",
+  "future_retrieval_plan": {
+    "status": "not_implemented",
+    "common_pipeline": "BM25 + dense vector retrieval + RRF + cross-encoder reranking",
+    "chunking": "section-aware with recursive overflow splitting; design pending",
+    "configurations": [
+      {
+        "target_chunk_tokens": 300,
+        "final_k": 3
+      },
+      {
+        "target_chunk_tokens": 500,
+        "final_k": 4
+      },
+      {
+        "target_chunk_tokens": 800,
+        "final_k": 5
+      }
+    ],
+    "overlap_tokens": null,
+    "candidate_pool_size": null,
+    "open_decisions": [
+      "Define overlap consistently and freeze before testing.",
+      "Choose embedding/reranker context capacities that support full chunks without truncation.",
+      "Separate quality comparison from quota interference."
+    ]
+  }
+}
