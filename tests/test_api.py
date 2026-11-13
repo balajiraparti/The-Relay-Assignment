@@ -77,7 +77,7 @@ def test_safe_unavailable_readiness(tmp_path,monkeypatch,problem,expected):
     monkeypatch.setattr(api,'Retriever',broken)
     with TestClient(api.app) as client:
         response=client.get('/health/ready')
-        assert response.status_code==503 and response.json()['detail']==expected
+        assert response.status_code==503 and response.json()['error']['code']==expected
         assert 'private' not in response.text
         assert client.get('/health/live').status_code==200
 
@@ -85,3 +85,31 @@ def test_safe_unavailable_readiness(tmp_path,monkeypatch,problem,expected):
 def test_history_is_shared_local_state(client):
     row=client.post('/v1/requests',json={'question':'How does it work?'},headers={'Idempotency-Key':'shared-history-key'}).json()
     assert row['id'] in [item['id'] for item in client.get('/v1/requests').json()['items']]
+
+
+def test_replay_no_inference_and_cursor_is_bound(client):
+    store=api.app.state.store
+    rid,_=store.create('event-key','hash',{'question':'test'})
+    store.update(rid,'answered',{'answer':'Safe validated text.','citations':[]})
+    events=store.public_events(rid)
+    response=client.get(f'/v1/requests/{rid}/events')
+    assert response.status_code==200 and response.text.count('event: done')==1
+    replay=client.get(f'/v1/requests/{rid}/events',headers={'Last-Event-ID':str(events[-1]['seq'])})
+    assert replay.text==''
+    assert client.get(f'/v1/requests/{rid}/events',headers={'Last-Event-ID':'-1'}).status_code==400
+    other,_=store.create('event-key2','hash',{'question':'other'})
+    assert client.get(f'/v1/requests/{other}/events',headers={'Last-Event-ID':str(events[-1]['seq'])}).status_code==400
+    page=client.get('/v1/requests?limit=1').json()
+    assert page['has_more']
+    next_page=client.get('/v1/requests',params={'limit':1,'cursor':page['next_cursor']}).json()
+    assert page['items'][0]['id']!=next_page['items'][0]['id']
+    assert client.get('/v1/requests',params={'cursor':page['next_cursor']+'x'}).status_code==400
+
+
+def test_safe_request_errors(client):
+    headers={'Idempotency-Key':'z'*16,'Content-Type':'application/json'}
+    assert client.post('/v1/requests',content='{',headers=headers).json()['error']['code']=='malformed_json'
+    assert client.post('/v1/requests',content='{}',headers={'Content-Type':'text/plain'}).status_code==415
+    bad=client.post('/v1/requests',json={'question':'secret','extra':'secret'},headers=headers)
+    assert bad.status_code==422 and 'secret' not in bad.text
+    assert client.get('/health/live').headers['X-Request-ID']

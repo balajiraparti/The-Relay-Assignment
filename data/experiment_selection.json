@@ -1,0 +1,13 @@
+{
+  "quality": "4bbf5470-b3b6-45fd-957e-16a01dc24aff",
+  "load": [
+    "d36145a9-0409-4fe2-8ba0-0ba56e389183",
+    "595fe9a0-04dc-466c-87cd-9a0b86bf23c3",
+    "1266666b-2173-4e3c-aa23-46feb643fad0",
+    "dc3709f5-2ed9-4efd-9aaa-85e6c5498eb0",
+    "05e66617-5b47-4110-b7fd-d45ec169a97d",
+    "d61186c2-d986-4d1f-812d-60316f7187fc",
+    "cec01f75-fc0e-4f1d-919b-911a36983a6a"
+  ],
+  "selection_reason": "First complete five scenario runs; controlled retry comparison replaces initial random-failure comparison that produced zero retries. All earlier trials remain in runtime/runs. Quality run is the first frozen 15-question by three-setting run. No failed rows are removed."
+}

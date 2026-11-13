@@ -1,0 +1,17 @@
+{
+  "source_file": "D:\\Projects\\The Relay Assignment\\runtime\\probes\\20261112T135123Z\\observations.json",
+  "source_sha256": "22e0ada10010992f5f6208caa9081dbff70ec48dda4527a59417a5fbe8b9961e",
+  "sample_count": 3,
+  "excluded_count": 0,
+  "first_delay_samples_seconds": [
+    15.954201299929991,
+    0.7760051998775452,
+    0.7911466001532972
+  ],
+  "tail_samples_seconds": [
+    0.045340599957853556,
+    0.014226000057533383,
+    0.03846219996921718
+  ],
+  "limitations": "Small generic-prompt sample; includes network/client overhead. Does not establish paper-answer latency, quality, failure probabilities, quota recovery or load-dependent scheduling."
+}

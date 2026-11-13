@@ -1,0 +1,29 @@
+[
+  {
+    "event": "standin_received",
+    "request_id": "e3361006-f44b-410e-b807-09359127e152",
+    "ordinal": 1,
+    "estimated_tokens": 260,
+    "fault": false
+  },
+  {
+    "event": "standin_worker_started",
+    "request_id": "e3361006-f44b-410e-b807-09359127e152",
+    "queue_ms": 0.0,
+    "delay_ms": 776.0051998775452
+  },
+  {
+    "event": "standin_completed",
+    "request_id": "e3361006-f44b-410e-b807-09359127e152"
+  },
+  {
+    "event": "standin_quota_refused",
+    "request_id": "5cf2fc54-8f66-4631-9c5d-ee851cbf7989",
+    "window": 86400
+  },
+  {
+    "event": "standin_quota_refused",
+    "request_id": "4f2dfde3-ca77-491c-9b79-6ae894e9089d",
+    "window": 86400
+  }
+]

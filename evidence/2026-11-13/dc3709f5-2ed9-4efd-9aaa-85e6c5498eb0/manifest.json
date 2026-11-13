@@ -1,0 +1,33 @@
+{
+  "id": "dc3709f5-2ed9-4efd-9aaa-85e6c5498eb0",
+  "kind": "load",
+  "state": "completed",
+  "source": "stand-in",
+  "scenario": "per_minute_limit_halved",
+  "created_at": "2026-11-13T06:30:28.802196+00:00",
+  "expected_arrivals": 12,
+  "interval_seconds": 0.2,
+  "profile": {
+    "workers": 1,
+    "queue_limit": 4,
+    "rpm": 3,
+    "tpm": 80000,
+    "rpd": 1000,
+    "tpd": 2000000,
+    "first_delay": 0.4,
+    "chunk_delay": 0.02,
+    "load_factor": 0.1,
+    "failure_rate": 0.0,
+    "fail_after_chunks": 0,
+    "fail_first_requests": 0,
+    "seed": 42,
+    "calibration": "D:\\Projects\\The Relay Assignment\\runtime\\calibration.json",
+    "log_dir": "D:\\Projects\\The Relay Assignment\\runtime\\runs\\dc3709f5-2ed9-4efd-9aaa-85e6c5498eb0\\logs"
+  },
+  "max_attempts": 3,
+  "retrieval": "fixed synthetic fixture; isolates gateway/provider, not CPU retrieval throughput",
+  "calibration_sha256": "6fc5e6156ce385e3b87764bd851024a1e53b6eb8cc58c89648194fbd6f61ced5",
+  "queue_peak": 9,
+  "schedule_lag_max_ms": 10.227699996903539,
+  "preconditioning_calls": 0
+}

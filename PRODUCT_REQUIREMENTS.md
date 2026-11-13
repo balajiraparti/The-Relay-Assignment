@@ -1,5 +1,7 @@
 # The Relay: Product Requirements Document
 
+**F13–F16 implementation scope:** durable atomic SSE replay and signed pagination, citation/page lookup, bounded CLI quality/load runs, exact-column CSV export and Streamlit history/run controls are implemented in this cycle. Run manifests/raw records/grades use versioned files; corpus remains immutable artifacts. Public events are persisted atomically in SQLite schema 4. Automatic content retention, a general diagnostic outbox, and multi-process concurrency coordination are deferred; the assignment deployment remains one local API process. Hosted experiments should run without concurrent interactive hosted traffic. See the API/DB implementation sections for exact supported contracts and PROJECT_STATUS.md for executed evidence rather than inferred completion.
+
 **Status:** Target specification with a partial runnable v0.1; see PROJECT_STATUS.md and README.md for implementation gaps.
 
 **v0.1 chunking decision:** RecursiveCharacterTextSplitter, measured with the embedding tokenizer, size 200 tokens and target overlap 30, split within PDF pages. This supersedes larger proposed baseline sizes for the current 256-token embedding model. No semantic chunking or corrective generation loop. First real observations are in FIRST_RUN_RESULTS.md; they are not a completed benchmark.

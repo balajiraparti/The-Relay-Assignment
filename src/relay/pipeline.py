@@ -98,7 +98,9 @@ class Pipeline:
         except TimeoutError:
             finish('timed_out',{'reason':'request_deadline'})
         except ModelError as e:
-            finish('rate_limited' if e.status==429 else 'timed_out' if e.status==408 else 'failed',{'reason':e.code,'http_status':e.status,'retry_after':e.retry_after})
+            finish('rate_limited' if e.status==429 else 'timed_out' if e.status==408 else 'failed',
+                   {'reason':e.code,'local_status':e.status,
+                    'http_status':e.status if e.code=='provider_http_error' else None,'retry_after':e.retry_after})
         except Exception as e:
             finish('failed',{'reason':type(e).__name__})
         finally:

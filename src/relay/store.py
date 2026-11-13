@@ -53,6 +53,7 @@ class Store:
             db.execute('INSERT INTO operations VALUES(?,?,?)',(rid,'request',now))
             db.execute('INSERT INTO requests VALUES(?,?,?,?,?,?,?,NULL)',
                        (rid, idem, body_hash, now, now, 'queued', json.dumps(body)))
+            self._public(db,rid,'status',{'status':'queued'})
             return rid, True
 
     def get(self, rid):
@@ -61,6 +62,7 @@ class Store:
         if not row:
             return None
         return {'id': row['id'], 'status': row['status'], 'created_at': row['created'],
+                'updated_at':row['updated'], 'body':json.loads(row['body']),
                 'question': json.loads(row['body'])['question'],
                 'result': json.loads(row['result']) if row['result'] else None}
 
@@ -72,15 +74,41 @@ class Store:
                 return False
             db.execute('UPDATE requests SET status=?,updated=?,result=? WHERE id=?',
                        (status, time.time(), json.dumps(result) if result else None, rid))
+            self._public(db,rid,'status',{'status':status})
+            if status in TERMINAL:
+                if status=='answered' and result:
+                    answer=result.get('answer','')
+                    for offset in range(0,len(answer),512):
+                        self._public(db,rid,'answer_delta',{'offset':offset,'text':answer[offset:offset+512]})
+                    self._public(db,rid,'citations',{'chunk_ids':[c['id'] for c in result.get('citations',[])]})
+                elif status=='needs_clarification':
+                    self._public(db,rid,'clarification',{'message':(result or {}).get('message')})
+                elif status not in ('refused','cancelled'):
+                    self._public(db,rid,'error',{'code':(result or {}).get('reason',status)})
+                self._public(db,rid,'done',{'status':status,'resource_url':f'/v1/requests/{rid}'})
             return True
 
-    def history(self, limit=20, before=None):
+    @staticmethod
+    def _public(db,rid,event,payload):
+        raw=json.dumps({'request_id':rid,**payload},ensure_ascii=False)
+        if len(raw.encode())>8192: raise ValueError('public_event_too_large')
+        db.execute('INSERT INTO public_events(request_id,created,event,payload) VALUES(?,?,?,?)',
+                   (rid,time.time(),event,raw))
+
+    def public_events(self,rid,after=0,limit=100):
         with self.connect() as db:
-            if before:
-                rows = db.execute('SELECT id FROM requests WHERE (created,id)<(?,?) ORDER BY created DESC,id DESC LIMIT ?',
-                                  (before[0], before[1], limit)).fetchall()
-            else:
-                rows = db.execute('SELECT id FROM requests ORDER BY created DESC,id DESC LIMIT ?', (limit,)).fetchall()
+            return [dict(r) for r in db.execute('SELECT * FROM public_events WHERE request_id=? AND seq>? ORDER BY seq LIMIT ?', (rid,after,limit))]
+
+    def cursor_secret(self):
+        with self.connect() as db:
+            return db.execute("SELECT value FROM local_metadata WHERE key='cursor_secret'").fetchone()[0].encode()
+
+    def history(self, limit=20, before=None, status=None, snapshot=None):
+        with self.connect() as db:
+            clauses=['created<=?']; values=[snapshot or time.time()]
+            if before: clauses.append('(created,id)<(?,?)'); values.extend(before)
+            if status: clauses.append('status=?'); values.append(status)
+            rows=db.execute('SELECT id FROM requests WHERE '+' AND '.join(clauses)+' ORDER BY created DESC,id DESC LIMIT ?',(*values,limit)).fetchall()
         return [self.get(r['id']) for r in rows]
 
     def event(self, rid, name, **safe_fields):

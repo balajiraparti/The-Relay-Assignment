@@ -1,0 +1,32 @@
+[
+  {
+    "id": "c33a1501-0b28-42b8-a667-ac67140e1793",
+    "request_id": "d5a46783-8c5a-47a2-85fe-ea6c8abc9556",
+    "source": "stand-in",
+    "created": 1794551428.8620498,
+    "estimated": 1716,
+    "tokens_in": 157,
+    "tokens_out": 20,
+    "state": "succeeded"
+  },
+  {
+    "id": "97c95d36-bee1-40ff-8d8d-9533839d935e",
+    "request_id": "64136d52-14f5-47d0-95c3-08cc1658cfbb",
+    "source": "stand-in",
+    "created": 1794551429.0563955,
+    "estimated": 1716,
+    "tokens_in": 157,
+    "tokens_out": 20,
+    "state": "succeeded"
+  },
+  {
+    "id": "628af1a1-ca3a-40e1-ab8e-49f10bdf2ebb",
+    "request_id": "fe99a4da-e7fd-4130-8bc4-8387975f3c25",
+    "source": "stand-in",
+    "created": 1794551429.7514653,
+    "estimated": 1716,
+    "tokens_in": 157,
+    "tokens_out": 20,
+    "state": "succeeded"
+  }
+]

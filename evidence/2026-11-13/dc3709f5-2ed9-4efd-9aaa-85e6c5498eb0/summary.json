@@ -1,0 +1,40 @@
+{
+  "complete": true,
+  "graded": true,
+  "expected_arrivals": 12,
+  "recorded": 12,
+  "percentile_method": "linear interpolation (n-1)*p; small-sample tails are descriptive only",
+  "population": "total includes every terminal outcome; first_token only observed validated answer emissions",
+  "cost_basis": "Listed paid-equivalent, no cached-token discount assumed; not actual Free-tier billing.",
+  "summaries": [
+    {
+      "source": "stand-in",
+      "scenario": "per_minute_limit_halved",
+      "setting": "R2",
+      "n": 12,
+      "first_token_n": 3,
+      "total_n": 12,
+      "answered": 3,
+      "total_p50": 8162.600800045766,
+      "total_p95": 17105.29111493379,
+      "total_p99": 17290.279742851853,
+      "first_token_p50": 16912.34100004658,
+      "first_token_p95": 17290.70262000896,
+      "first_token_p99": 17324.334764005616,
+      "ok_pct": 25.0,
+      "rate_limited_pct": 0.0,
+      "timeout_pct": 75.0,
+      "error_pct": 0.0,
+      "retries": 0,
+      "usage_complete": true,
+      "tokens_per_answer": 177.0,
+      "paid_equivalent_usd_per_1000_answers": null,
+      "grades": {
+        "correct": 0,
+        "refused_correctly": 0,
+        "refused_wrongly": 0,
+        "wrong": 0
+      }
+    }
+  ]
+}

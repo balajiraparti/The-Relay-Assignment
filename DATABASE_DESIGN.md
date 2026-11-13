@@ -1,5 +1,13 @@
 # The Relay database design
 
+## F13–F16 implementation update
+
+Actual schema version is 4. Numbered migrations remain in `src/relay/migrations.py`; earlier proposed migration names below are conceptual, not executable commands. Schema 4 adds `public_events(seq, request_id FK, created, event CHECK, payload JSON CHECK)`, an index on `(request_id,seq)`, and a unique partial index for one `done` per request. `local_metadata` holds the persisted cursor signing secret. Atomic request update plus public event insertion rolls back together on failure; a cancel/finalize race cannot publish two terminal outcomes. Startup recovery terminalizes interrupted requests and publishes their final event without repeating hosted work. Existing terminal records are backfilled with `done` only.
+
+Corpus revisions remain immutable checksummed files, not duplicated into relational tables. Evaluation runs similarly use UUID folders with atomic manifest/summary replacement and append-only raw request JSONL; grading is a separate request-ID mapping with reviewer and rationale. The CLI refuses final exports with missing arrivals, duplicate IDs, incomplete runs or missing required grades. Interrupted file-based runs are visibly `running` until reviewed; export is blocked and a recovery command/explicit incomplete manifest is needed. No assertion of crash-safe exactly-once filesystem delivery is made.
+
+Automatic seven-day retention, content tombstones/410, full diagnostic JSONL outbox delivery and concurrent grade editing are deferred. Public UI events themselves are a durable transactional outbox read directly by SSE; operational logs still use the bounded writer. No original PDFs, `.env`, or previous immutable indexes are deleted. Raw submission evidence is deliberately copied into a curated `evidence/` directory after checking it for secrets; databases, operational logs and caches remain untracked.
+
 Status: F03 persistence foundation implemented and tested, November 12, 2026; remaining schemas below are target contracts. References: [PRD](PRODUCT_REQUIREMENTS.md), [API contract](API_DESIGN.md).
 
 ## 1. Storage architecture

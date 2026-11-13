@@ -3,7 +3,7 @@ import sqlite3
 import time
 from pathlib import Path
 
-VERSION=3
+VERSION=4
 BASELINE='''
 CREATE TABLE schema_version(version INTEGER PRIMARY KEY);
 INSERT INTO schema_version VALUES(1);
@@ -58,6 +58,21 @@ INSERT INTO schema_version VALUES(3);
 '''
 
 
+PUBLIC_EVENTS='''
+CREATE TABLE public_events(seq INTEGER PRIMARY KEY AUTOINCREMENT, request_id TEXT NOT NULL REFERENCES requests(id),
+created REAL NOT NULL, event TEXT NOT NULL CHECK(event IN ('status','answer_delta','citations','clarification','error','done')),
+payload TEXT NOT NULL CHECK(json_valid(payload)));
+CREATE INDEX public_event_request ON public_events(request_id,seq);
+CREATE UNIQUE INDEX one_done ON public_events(request_id) WHERE event='done';
+CREATE TABLE local_metadata(key TEXT PRIMARY KEY, value TEXT NOT NULL);
+INSERT INTO local_metadata VALUES('cursor_secret',lower(hex(randomblob(32))));
+INSERT INTO public_events(request_id,created,event,payload)
+SELECT id,updated,'done',json_object('status',status) FROM requests
+WHERE status IN ('answered','refused','needs_clarification','failed','timed_out','cancelled','rate_limited');
+INSERT INTO schema_version VALUES(4);
+'''
+
+
 def check(db):
     if db.execute('PRAGMA integrity_check').fetchone()[0]!='ok' or db.execute('PRAGMA foreign_key_check').fetchall():
         raise RuntimeError('database_integrity_failed')
@@ -82,7 +97,7 @@ def migrate(path):
             finally: backup.close()
         # execute statements individually so DDL/copy/version update share one transaction.
         db.execute('BEGIN IMMEDIATE')
-        sql=(BASELINE if old==0 else '')+(FOUNDATION if old<2 else '')+(GATEWAY if old<3 else '')
+        sql=(BASELINE if old==0 else '')+(FOUNDATION if old<2 else '')+(GATEWAY if old<3 else '')+(PUBLIC_EVENTS if old<4 else '')
         statement=''
         for line in sql.splitlines(keepends=True):
             statement+=line

@@ -4,26 +4,28 @@ Last reviewed: November 13, 2026 (F04–F08 work began November 12).
 
 ## Current state
 
+**Active cycle: F13–F16 (November 13).** F13 and F15 implemented and verified; F14 experiment execution/export implemented with author grade verification pending; F16 report/package implementation with final author feedback/reflection pending. The user explicitly authorized all four milestones and asked to leave Vaani feedback until the end. No user opinion is invented.
+
 Version control: Git initialized with origin https://github.com/balajiraparti/The-Relay-Assignment.git. Main holds baseline f775d3b; dev contains project import b554b4a, successfully pushed to GitHub. Future important completed features are committed and pushed on dev after checks. Pull-request merges remain separate. Secrets and generated runtime artifacts are excluded. This setup does not complete another product milestone.
 
-**Phase: F01–F12 complete within their documented scope. Overall project is not complete.** F09–F12 were explicitly authorized and verified together. Product/package version remains 0.1.0; database schema is 3. This cycle made three bounded hosted calls, including one schema refusal retained in the results.
+**Phase: F01–F13 and F15 complete within their documented implementation scope; F14/F16 await final evidence/author review. Overall submission is not yet final.** Product/package version remains 0.1.0; database schema is 4. See this cycle's verification below; earlier three-call evidence remains historical, separate from the new evaluation.
 
 Workspace now contains the Python package under src/relay, Streamlit UI, tests, README, dependency manifest and runtime evidence. Original PDFs and .env have been preserved. Version markers in all three PDFs matched the brief; SHA-256 checksums were recorded. Groq key presence and three successful real calls were verified without printing the key.
 
 | Area | State | Evidence / remaining work |
 | --- | --- | --- |
 | Product and architecture | Documented | PRODUCT_REQUIREMENTS.md |
-| API contracts | Partially implemented | Request create/get/history/cancel, capabilities, papers and readiness; full contract still pending |
-| Database design | Foundation complete; later schemas pending | Numbered migrations, verified backups, constrained operations/requests/calls/events; corpus/evaluation/outbox schema remains pending |
+| API contracts | F13 implemented | Atomic SSE replay, signed pagination, clarification parents, citations/pages, run views/exports; exact scope and deferred retention in API_DESIGN.md |
+| Database design | Schema 4 verified | Transactional public events and terminal uniqueness; immutable corpus/evaluation artifacts deliberately remain files |
 | Source PDFs | Audited and durably extracted | Exact version markers and pinned data/corpus.lock.json hashes; 120 pages, 600 recursive chunks; full page text and warnings retained in immutable artifacts |
-| Local configuration | Verified for first probe | Key presence checked; three real calls succeeded |
+| Local configuration | Verified for controlled evaluation | 32 hosted completions in the new run; key never printed; 10 local quota refusals and 3 no-call clarifications retained |
 | Backend, retrieval and model integration | Partial first version verified | Real paper answer with two citations recorded in FIRST_RUN_RESULTS.md; broader quality grading pending |
 | Persistence | F03 foundation complete | Constraints, migration rollback, preserved legacy data and concurrent quota reservations tested |
-| Stand-in, logging and experiments | Stand-in/gateway verified; experiments partial | Actual loopback HTTP/SSE fault tests; bounded workers/queues, deadlines, retries and persisted budgets/cooldowns; broader experiment runner pending |
-| UI | Initial Streamlit screen verified | Prior health/form checks passed; current running state not asserted; full browser/interaction coverage pending |
+| Stand-in, logging and experiments | Executed; author grading review pending | 100 selected synthetic arrivals plus 45 real-pipeline arrivals; raw data/grades/tables retained; real upstream 429/recovery not measured |
+| UI | F15 verified and running | Streamlit interaction checks and live health/API replay/citation/page/download checks passed on ports 8501/8000 |
 | Build tracking | Complete | This file and AGENTS.md |
 
-**Completed milestones: F01–F12 (12 of 16).** The final suite has 82 passing tests. This milestone count is not an effort percentage. Answer-quality and load benchmarks are not complete; a live citation-valid overstatement is explicitly retained for later grading.
+**Completed implementation milestones: F01–F13 and F15 (14 of 16); F14/F16 implemented with review gaps.** The latest full suite has 93 passing tests; a subsequent focused suite has 28 passes. This count is not an effort percentage. The new evaluation retains wrong answers, false refusals and local quota rejections rather than excluding them.
 
 ## How to use this file
 
@@ -43,7 +45,7 @@ No feature silently adds paid services, replaces the selected architecture, rest
 
 ## Modular implementation backlog
 
-Current milestone states: F01–F12 Done; F13 partial; F14 partial provider probe only; F15a has basic form verification; F15b/F15c and F16 pending. The table preserves full acceptance criteria.
+Current milestone states: F01–F13 Done; F14 Implemented — author verification pending; F15 Done; F16 Implemented — final author content/package review pending. The table preserves full acceptance criteria.
 
 | ID | Feature / boundary | Dependencies | Acceptance / demonstrable output |
 | --- | --- | --- | --- |
@@ -84,6 +86,17 @@ F09 has a real-service prerequisite; F07–08 can be implemented and tested with
 | Streamlit UI | Display, session-scoped API client, idempotent forms and progress polling | Provider secrets, direct Groq/DB access, globally cached authenticated clients |
 
 ## Next work item
+
+**Current next task:** verify provisional grades against the 15 fixed questions and cited PDFs, then supply the author's Vaani website feedback and approve the assistant reflection. The original brief was recovered from its conversation attachment; all exact headings are in the two-page report generator. F14 also explicitly lacks a real upstream 429/recovery observation. The local gateway was not disabled to manufacture one. Full fresh-machine dependency/model download has not been executed; pinned dependencies pass compatibility checks. These are genuine limitations, not completed live integrations.
+
+### F13–F16 changed-file and verification evidence
+
+- **F13:** `migrations.py`, `store.py`, `pagination.py`, `api.py`, `pipeline.py`; atomic public events, unique terminal done, signed snapshot/filter cursors, citation/page endpoints, safe errors and local/provider status distinction. `test_public_events.py` exercises 20 cancel/finalize races and transactional rollback; API tests replay without inference, malformed input and cursors. U01/U03/U04/U05/U06; E23–E27. Automatic retention and broad diagnostic outbox remain deferred in API/DB contracts.
+- **F14:** `experiments.py`, `load_experiments.py`, frozen `data/evaluation_questions.json`, exact-column export, explicit offline `grade_run.py`, `collect_evidence.py`, `report_tables.py`. Seven selected stand-in runs cover the five required scenarios and controlled retry comparison; first random retry trials remain in runtime and were not used to claim an effect. Model results/grades and manifests are separate. Unknown token usage and capacity outcomes are preserved. Small samples, simultaneous local synthetic/real activity, and a single fixed chunk size limit inference.
+- **F15:** `ui/app.py`, `tests/test_ui.py`; clarification parent, polling stops on terminal outcome, paginated history, source/usage display, operator run list/detail/stop/download, understandable capacity states. Executed Streamlit AppTest proves form rerun idempotency, ambiguous-response key reuse and clarification/history controls. This is interaction-test evidence, not a browser latency benchmark.
+- **F16:** `requirements.lock.txt`, `docs/SUBMISSION_CHECKLIST.md`, verbatim user-message snapshot `docs/assistant-prompts.json`, report/table/package scripts, curated `evidence/` and `output/pdf/`. Two-page PDF rendered and visually inspected; report is explicitly an author-review draft. The user requested Vaani feedback be deferred to the end. Prompt export is a bounded snapshot, not a fictional complete final-turn transcript.
+
+The following readiness-audit notes describe the prior milestone, not the current next action:
 
 **Readiness audit complete (November 13).** Logger and Groq are verified for controlled probes. F09 measurement hardening now records explicit successful upstream status, disables probe retries and separates local/provider errors. One real call returned 200 with 660.9 ms TTFT, 799.9 ms total and 82/26 tokens; matching JSONL was verified. No real 429 or recovery was measured. The full percentile/recovery runner remains F14 work. User priority: collect real evidence before further stand-in calibration; see docs/REAL_SERVICE_READINESS.md.
 
@@ -166,6 +179,21 @@ The user explicitly requested a runnable initial version and real measurements i
 Add feature-specific executed checks here; planned checks belong in the backlog until run.
 
 ## Change log
+
+### November 13 F13–F16 verification ledger supplement
+
+| Check actually executed | Result | Limitation |
+| --- | --- | --- |
+| Full `pytest -q` after API/export/UI implementation | 93 passed in 14.54 s | Fixture/local HTTP tests do not establish hosted quality |
+| Focused pipeline/UI/API suite after final capacity/status messages | 28 passed in 11.71 s | No new hosted calls |
+| `relay.experiments quality --interval 30` | 45 arrivals, 15 questions x 3 settings; 32 hosted completions, 10 local quota rejections, 3 no-call clarifications | 35 provisional assistant-reviewed completed outputs; independent author hand-verification pending; no real 429/recovery |
+| `relay.experiments load` plus explicit retry comparison | Five required load scenarios and controlled one/three-attempt comparison; 100 selected arrivals | Tiny bootstrap calibration, synthetic evidence/retrieval; load-dependent parameters not calibrated; earlier no-retry comparison retained in runtime |
+| `scripts/verify_submission.py` | 145 unique exact-column CSV rows match raw records; all hashes valid; tables regenerate byte-for-byte; PDF has two pages | Author-review draft; raw runtime artifacts remain untracked; curated secret-checked evidence is intentional |
+| PDF render + visual inspection | Both pages inspected, no clipping/overlap | Dense two-page assignment format |
+| `uv --cache-dir .cache/uv pip check --python .venv/Scripts/python.exe` | All 97 installed packages compatible; 96 dependencies pinned excluding editable project | Clean-machine downloads/setup not executed |
+| Live API/UI checks | Ready 200, Streamlit health 200; no-call clarification; SSE exactly one done; retained citation/page and completed CSV endpoints 200 | Browser delivery latency not measured; no additional Groq requests |
+
+Changed-file evidence: API/DB/PRD/README contracts, `src/relay/{api,store,migrations,pagination,experiments,load_experiments,pipeline}.py`, `ui/app.py`, tests, frozen questions/review/selection, reporting/packaging scripts, lockfile, curated evidence, two-page report and verbatim prompt snapshot. F13/F15 Done; F14/F16 remain implemented with the author-review and measurement gaps listed above. Next action: review grades/reflection and add the deferred Vaani feedback; do not claim a final submission until then.
 
 | Date | Change | Implementation impact |
 | --- | --- | --- |

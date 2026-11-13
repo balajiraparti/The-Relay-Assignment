@@ -1,0 +1,13 @@
+request_id,scenario,source,start_time,first_token_ms,total_ms,status,retries,tokens_in,tokens_out,retrieval_setting,answer_grade
+d5a46783-8c5a-47a2-85fe-ea6c8abc9556,per_minute_limit_halved,stand-in,2026-11-13T06:30:28.810376+00:00,975.2937001176178,980.334100080654,ok,0,157,20,R2,
+e7347713-8f7b-4809-925b-6517de0a54cd,per_minute_limit_halved,stand-in,2026-11-13T06:30:29.414519+00:00,,8423.230699962005,timeout,0,0,0,R2,
+1bf8c3ec-c964-433c-bc03-c25609d4ab24,per_minute_limit_halved,stand-in,2026-11-13T06:30:29.619560+00:00,,8233.235999941826,timeout,0,0,0,R2,
+25c337b2-d7c6-46aa-82e0-baa4b41e8087,per_minute_limit_halved,stand-in,2026-11-13T06:30:29.808953+00:00,,8140.781000023708,timeout,0,0,0,R2,
+d76af085-33ea-4ae5-a4b2-f0c5bdb4d7f3,per_minute_limit_halved,stand-in,2026-11-13T06:30:30.004213+00:00,,8124.713400145993,timeout,0,0,0,R2,
+5dbcfa3d-5993-404d-afa7-8484ec516367,per_minute_limit_halved,stand-in,2026-11-13T06:30:30.204805+00:00,,8110.618400154635,timeout,0,0,0,R2,
+8e112d58-c2dc-432d-90da-f81de63b73f4,per_minute_limit_halved,stand-in,2026-11-13T06:30:30.428213+00:00,,8121.877999976277,timeout,0,0,0,R2,
+a5128b00-e390-43a4-b6d2-bb3fdf6d00d7,per_minute_limit_halved,stand-in,2026-11-13T06:30:30.621228+00:00,,8176.613100105897,timeout,0,0,0,R2,
+4ce89d01-63ff-43d9-a869-b80ccadcf6f7,per_minute_limit_halved,stand-in,2026-11-13T06:30:30.820644+00:00,,8148.588499985635,timeout,0,0,0,R2,
+7b666177-4b23-4334-869f-fafc0e642d67,per_minute_limit_halved,stand-in,2026-11-13T06:30:31.036264+00:00,,8215.19700018689,timeout,0,0,0,R2,
+64136d52-14f5-47d0-95c3-08cc1658cfbb,per_minute_limit_halved,stand-in,2026-11-13T06:30:29.006292+00:00,16912.34100004658,16916.098200017586,ok,0,157,20,R2,
+fe99a4da-e7fd-4130-8bc4-8387975f3c25,per_minute_limit_halved,stand-in,2026-11-13T06:30:29.220978+00:00,17332.74280000478,17336.52689983137,ok,0,157,20,R2,

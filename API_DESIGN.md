@@ -1,5 +1,17 @@
 # The Relay API design
 
+## F13–F16 implemented contract (November 13, 2026)
+
+This section supersedes conflicting aspirational details below. The local API has no authentication. Requests retain the existing nested `result` response for compatibility; `body` contains question/settings/optional clarification parent and pinned source/model/index, and `updated_at` is added. Timestamps in request resources remain Unix seconds; experiment CSV timestamps are UTC ISO-8601. Chunk IDs are 20 hexadecimal characters, index revisions 16, request/run IDs UUIDs.
+
+Schema 4 atomically writes state plus public events in the same transaction. `done` is unique per request; cancellation and finalization use first-terminal-wins. SSE replays durable, sanitized status/validated-answer/citation-ID/clarification/error/done events; Last-Event-ID must belong to that request. Heartbeats have no IDs. Old terminal requests receive a migration `done` event; their complete answers remain available through GET. Events are retained without automatic expiry in this assignment version. No draft or reasoning is published. A disconnected subscriber never cancels inference.
+
+History supports `limit`, signed one-hour `cursor`, and `status` (filter-bound, snapshot cutoff, keyset ordering). Papers, runs and run events are paginated. Citation lookup accepts optional `revision` for retained immutable indexes. Paper metadata/page text, settings, local quota snapshot, run details/stop/results.csv/events are implemented. Run creation stays CLI-only. Run stop stops future arrivals and lets already active work finish. There is no request-history `run_id` filter; use the run detail/export. Run events provide sanitized request summaries or provider simulation events, not arbitrary log searching. Unknown query fields fail 422.
+
+Validation errors omit input values. Missing resources return 404; malformed JSON 400; unknown fields 422; incompatible body media type 415; conflicting idempotency body 409. Completed/ungraded runs require `allow_incomplete=true` and return an explicitly named incomplete CSV; active runs always return 409. Required CSV columns remain exact; nullable measurements/grades are empty cells with reasons in raw JSON/manifest. `X-Request-ID` identifies HTTP operations, distinct from the durable RAG ID. Idempotency keys and request content are retained indefinitely locally; automatic purge/410 expiry are deferred, not claimed.
+
+The stand-in's implemented internal endpoint is `/v1/chat/completions` on a loopback-only listener, with no extra secret and no Groq credentials forwarded. Profiles are startup-only. This supersedes the earlier proposed `/internal/completions` secret scheme. One active API process is supported; do not run multiple web workers. Experiment processes share the persistent real quota ledger, but process-local concurrency semaphores are not a distributed dispatcher: run hosted experiments without interactive hosted traffic for controlled comparisons.
+
 Status: implementation contract draft, November 12, 2026. Source: [PRD](PRODUCT_REQUIREMENTS.md). Storage contract: [Database design](DATABASE_DESIGN.md). No separate system-design file exists yet. All examples are illustrative, not measured runs.
 
 ## 1. Scope and decisions

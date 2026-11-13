@@ -1,5 +1,28 @@
 # The Relay — first runnable version
 
+## F13–F16 workflows
+
+Migrate to schema 4 before starting the updated API. SSE replay is available at `/v1/requests/{id}/events` with `Last-Event-ID`; history has signed cursors and optional status filtering. `/v1/chunks/{id}?revision=...` resolves retained citations. Streamlit now has clarification follow-ups, cancellation, paginated history, experiment inspection and explicit CSV downloads. No sign-in is required.
+
+```powershell
+# Optional exact measured-environment dependency install (Python 3.11 / Windows)
+uv pip install --python .venv/Scripts/python.exe -r requirements.lock.txt
+uv pip install --python .venv/Scripts/python.exe --no-deps -e .
+.venv/Scripts/python.exe -m relay.cli migrate
+
+# Hosted evaluation: 15 questions x 3 settings, paced; uses your shared quota
+.venv/Scripts/python.exe -m relay.experiments quality --interval 30
+
+# Synthetic load suite; starts/stops its own loopback stand-in listeners
+.venv/Scripts/python.exe -m relay.experiments load
+
+# Review each answer and record an explicit offline grade
+.venv/Scripts/python.exe scripts/grade_run.py RUN_UUID REQUEST_UUID --grade correct --reviewer YOUR_NAME --rationale 'Checked the cited PDF passage'
+.venv/Scripts/python.exe -m relay.experiments export --run RUN_UUID
+```
+
+Keep hosted experiments separate from interactive hosted requests for controlled measurements. Persisted quotas are shared, but the concurrency semaphore is process-local. Never remove the quota ledger to evade limits. `export --allow-incomplete` labels incomplete/ungraded files explicitly; no missing metric is filled with zero. See [submission checklist](docs/SUBMISSION_CHECKLIST.md), curated `evidence/2026-11-13/`, and the current tracker for measured outcomes and remaining author review. The earlier v0.1 boundary notes below describe historical scope; API_DESIGN.md's F13–F16 section supersedes them.
+
 Local Streamlit interface + FastAPI backend. No sign-in. Uses the three PDFs in `data/`, page-preserving recursive token-counted splitting, BM25 + FAISS reciprocal-rank fusion, local cross-encoder reranking, and GPT-OSS 120B through a shared gateway. No corrective generation loop.
 
 ## Setup (PowerShell)

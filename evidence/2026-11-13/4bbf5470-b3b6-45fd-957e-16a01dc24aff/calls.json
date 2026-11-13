@@ -1,0 +1,322 @@
+[
+  {
+    "id": "c01544fc-08d8-4167-98fb-dd6c2e69fc63",
+    "request_id": "bd772504-f9b3-4f9d-ac50-819661e98866",
+    "source": "groq",
+    "created": 1794551328.1067462,
+    "estimated": 5425,
+    "tokens_in": 1079,
+    "tokens_out": 125,
+    "state": "succeeded"
+  },
+  {
+    "id": "a0efb6c6-b552-4e10-bf12-782d0ed0f1a7",
+    "request_id": "4bb8c391-8d17-4fe0-98c5-325b6374bd4f",
+    "source": "groq",
+    "created": 1794551358.8903773,
+    "estimated": 6017,
+    "tokens_in": 1252,
+    "tokens_out": 153,
+    "state": "succeeded"
+  },
+  {
+    "id": "e243909e-addf-40db-9b36-e9b3748a13de",
+    "request_id": "f22b8572-4bfa-4b93-ae8d-21f78616d470",
+    "source": "groq",
+    "created": 1794551418.1290364,
+    "estimated": 4541,
+    "tokens_in": 1039,
+    "tokens_out": 158,
+    "state": "succeeded"
+  },
+  {
+    "id": "eeef7977-e20d-4783-9ea8-bb0fac5a443f",
+    "request_id": "c36670ce-29f2-4d90-b142-b478d8bb070e",
+    "source": "groq",
+    "created": 1794551449.0782566,
+    "estimated": 5661,
+    "tokens_in": 1187,
+    "tokens_out": 158,
+    "state": "succeeded"
+  },
+  {
+    "id": "26169e33-f66a-4eb2-b40a-c97a2b0fea80",
+    "request_id": "6eebe80c-484c-49b4-972c-eaa1393edcb8",
+    "source": "groq",
+    "created": 1794551479.3288686,
+    "estimated": 6499,
+    "tokens_in": 1406,
+    "tokens_out": 117,
+    "state": "succeeded"
+  },
+  {
+    "id": "0341bffd-13a5-4207-88d8-17401b5bbd46",
+    "request_id": "cbf0de0f-7928-41cc-aca1-7419edd123de",
+    "source": "groq",
+    "created": 1794551538.8916595,
+    "estimated": 6088,
+    "tokens_in": 1240,
+    "tokens_out": 153,
+    "state": "succeeded"
+  },
+  {
+    "id": "646e93bb-3a16-41c5-ac9f-5510ffeed4ca",
+    "request_id": "f022c304-58d4-4ccd-a4af-2ee5d9700063",
+    "source": "groq",
+    "created": 1794551598.1410117,
+    "estimated": 5344,
+    "tokens_in": 1038,
+    "tokens_out": 240,
+    "state": "succeeded"
+  },
+  {
+    "id": "c7ea5c1f-32c5-411e-9dc2-5aad671d7629",
+    "request_id": "12e7facc-8615-427c-b6f9-6e26dc77bcce",
+    "source": "groq",
+    "created": 1794551628.787748,
+    "estimated": 6138,
+    "tokens_in": 1238,
+    "tokens_out": 230,
+    "state": "succeeded"
+  },
+  {
+    "id": "e9934e60-0c42-4b8c-8582-114f1badd58d",
+    "request_id": "0d772475-26d8-4f7b-b017-096732135afb",
+    "source": "groq",
+    "created": 1794551658.9060917,
+    "estimated": 6458,
+    "tokens_in": 1321,
+    "tokens_out": 184,
+    "state": "succeeded"
+  },
+  {
+    "id": "e00f96e4-5b64-4d54-970a-d9f43baa54b6",
+    "request_id": "59b512bc-b8c8-4e82-9596-9a6dfb976b16",
+    "source": "groq",
+    "created": 1794551718.7408686,
+    "estimated": 6118,
+    "tokens_in": 1281,
+    "tokens_out": 237,
+    "state": "succeeded"
+  },
+  {
+    "id": "5074b52a-de33-4c04-b265-4fb300621c6a",
+    "request_id": "4d98f0cf-26b2-4695-add9-5f8445a9a7db",
+    "source": "groq",
+    "created": 1794551778.1412709,
+    "estimated": 5251,
+    "tokens_in": 1168,
+    "tokens_out": 53,
+    "state": "succeeded"
+  },
+  {
+    "id": "5aafc01c-050d-47be-a8a1-b369411fbb71",
+    "request_id": "b1ff210f-911c-48e2-98ad-9caeafcda592",
+    "source": "groq",
+    "created": 1794551808.7390633,
+    "estimated": 6130,
+    "tokens_in": 1301,
+    "tokens_out": 122,
+    "state": "succeeded"
+  },
+  {
+    "id": "ff4dcb21-1117-4dcf-959e-ddd668ceec3d",
+    "request_id": "ca7439bc-ce90-4a65-8e58-898f2d91f1bb",
+    "source": "groq",
+    "created": 1794551868.146947,
+    "estimated": 5270,
+    "tokens_in": 1021,
+    "tokens_out": 131,
+    "state": "succeeded"
+  },
+  {
+    "id": "96264556-4b27-484e-add5-6d686a2eb2c4",
+    "request_id": "c3f7c0d4-860e-4383-9dd7-24a62fcd615c",
+    "source": "groq",
+    "created": 1794551898.8736691,
+    "estimated": 6257,
+    "tokens_in": 1238,
+    "tokens_out": 135,
+    "state": "succeeded"
+  },
+  {
+    "id": "83bc39d7-1137-452a-b509-55a34326934e",
+    "request_id": "e5fd9e4e-85de-4f07-9863-8f9538b081b3",
+    "source": "groq",
+    "created": 1794551958.1848,
+    "estimated": 5268,
+    "tokens_in": 1050,
+    "tokens_out": 132,
+    "state": "succeeded"
+  },
+  {
+    "id": "76440fe3-d93b-4e1d-8154-2ace8817d8c8",
+    "request_id": "57386dde-11fc-40b2-a68a-a5329457c2b7",
+    "source": "groq",
+    "created": 1794551988.7971964,
+    "estimated": 6142,
+    "tokens_in": 1313,
+    "tokens_out": 118,
+    "state": "succeeded"
+  },
+  {
+    "id": "a1c44dbe-1f1f-498e-98be-1f65d10040b7",
+    "request_id": "b32f7b7b-b0f6-41a9-969b-8d8d864427eb",
+    "source": "groq",
+    "created": 1794552048.1597087,
+    "estimated": 5232,
+    "tokens_in": 1077,
+    "tokens_out": 172,
+    "state": "succeeded"
+  },
+  {
+    "id": "6a6384bb-cc5d-4b5a-9c42-39e861885229",
+    "request_id": "9e9b9948-0047-4ec9-bd28-3e86d314d755",
+    "source": "groq",
+    "created": 1794552078.8102782,
+    "estimated": 6387,
+    "tokens_in": 1272,
+    "tokens_out": 176,
+    "state": "succeeded"
+  },
+  {
+    "id": "9356ce82-83df-4c8e-bece-bb7ee11ae128",
+    "request_id": "ea218623-83cc-4edb-8ec3-f4ae9aaadf2a",
+    "source": "groq",
+    "created": 1794552138.1727571,
+    "estimated": 4484,
+    "tokens_in": 1122,
+    "tokens_out": 35,
+    "state": "succeeded"
+  },
+  {
+    "id": "432ae2d5-4a94-4caa-97a2-9d07c1dc6e7d",
+    "request_id": "7fcae8f4-4cfd-460a-8ced-cf53696ce99d",
+    "source": "groq",
+    "created": 1794552168.745391,
+    "estimated": 5695,
+    "tokens_in": 1325,
+    "tokens_out": 54,
+    "state": "succeeded"
+  },
+  {
+    "id": "3adda77d-6039-4b06-b183-9b71ca5c9176",
+    "request_id": "c727240e-0697-49ab-9097-09a4f7b46171",
+    "source": "groq",
+    "created": 1794552198.7898142,
+    "estimated": 6421,
+    "tokens_in": 1551,
+    "tokens_out": 61,
+    "state": "succeeded"
+  },
+  {
+    "id": "b1accf75-7ef5-49a3-b153-2ad7f2630762",
+    "request_id": "082b2a4f-a2e3-4933-8748-e95477d0c3d2",
+    "source": "groq",
+    "created": 1794552228.1788719,
+    "estimated": 4182,
+    "tokens_in": 976,
+    "tokens_out": 27,
+    "state": "succeeded"
+  },
+  {
+    "id": "f2610f5e-5849-40d2-8377-267c4870f8d0",
+    "request_id": "a0d5dcc4-cbe7-468f-8853-b208f8868e21",
+    "source": "groq",
+    "created": 1794552258.8518782,
+    "estimated": 4541,
+    "tokens_in": 1135,
+    "tokens_out": 47,
+    "state": "succeeded"
+  },
+  {
+    "id": "b8b647de-95fb-408c-b1cd-8fefc5053eec",
+    "request_id": "31f1e104-f372-4982-9b6b-e505057fda40",
+    "source": "groq",
+    "created": 1794552288.815231,
+    "estimated": 5348,
+    "tokens_in": 1355,
+    "tokens_out": 49,
+    "state": "succeeded"
+  },
+  {
+    "id": "d9cd66ab-cb89-464b-a6dd-3aa425bc1e99",
+    "request_id": "1f3ec3a5-c45f-43c8-9c45-6b08b9306274",
+    "source": "groq",
+    "created": 1794552318.173196,
+    "estimated": 4563,
+    "tokens_in": 1117,
+    "tokens_out": 47,
+    "state": "succeeded"
+  },
+  {
+    "id": "91db8342-e3c2-48c1-96e6-d042ad6dc547",
+    "request_id": "f7e9de6d-3ca0-47cb-9194-e257235ce114",
+    "source": "groq",
+    "created": 1794552348.8696942,
+    "estimated": 5223,
+    "tokens_in": 1194,
+    "tokens_out": 33,
+    "state": "succeeded"
+  },
+  {
+    "id": "cf5e48e1-0646-4012-8775-ee3cac7e98a4",
+    "request_id": "ab49fc35-db4f-4990-9004-7c893f6f1911",
+    "source": "groq",
+    "created": 1794552378.9552634,
+    "estimated": 5605,
+    "tokens_in": 1314,
+    "tokens_out": 36,
+    "state": "succeeded"
+  },
+  {
+    "id": "ad07b0c2-6b97-41f0-b5e0-3f8b0a45da07",
+    "request_id": "3c3deb12-d760-4bcd-9988-0659130b6bdd",
+    "source": "groq",
+    "created": 1794552408.1633127,
+    "estimated": 5012,
+    "tokens_in": 1034,
+    "tokens_out": 164,
+    "state": "succeeded"
+  },
+  {
+    "id": "49901d00-5f58-4b34-b2db-b1be81b43de0",
+    "request_id": "e8ba9449-b11c-4be6-bc52-a836606622d9",
+    "source": "groq",
+    "created": 1794552468.7897506,
+    "estimated": 6962,
+    "tokens_in": 1433,
+    "tokens_out": 184,
+    "state": "succeeded"
+  },
+  {
+    "id": "211043bc-51e0-45d5-8a20-a87294e13dab",
+    "request_id": "77d0fff7-1b3c-472d-abfa-e648edbb0d1f",
+    "source": "groq",
+    "created": 1794552588.3022847,
+    "estimated": 4392,
+    "tokens_in": 880,
+    "tokens_out": 45,
+    "state": "succeeded"
+  },
+  {
+    "id": "df5b61bf-81ee-455e-a6fb-3eef89cb3c09",
+    "request_id": "f783cd74-4952-4005-8cec-c7bf70e2554f",
+    "source": "groq",
+    "created": 1794552619.361622,
+    "estimated": 4069,
+    "tokens_in": 846,
+    "tokens_out": 66,
+    "state": "succeeded"
+  },
+  {
+    "id": "a61966a3-d751-4a58-8748-f0bad4a6b076",
+    "request_id": "dbdd335a-8835-4572-9fa7-45fbfd7135e3",
+    "source": "groq",
+    "created": 1794552649.3647988,
+    "estimated": 4933,
+    "tokens_in": 1076,
+    "tokens_out": 67,
+    "state": "succeeded"
+  }
+]

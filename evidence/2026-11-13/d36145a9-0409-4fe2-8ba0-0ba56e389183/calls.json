@@ -1,0 +1,42 @@
+[
+  {
+    "id": "f9905b9a-7ba2-4c47-985b-1656ac749078",
+    "request_id": "8ceb8332-3143-4cc0-8aa4-49537ba3cea3",
+    "source": "stand-in",
+    "created": 1794551358.9495645,
+    "estimated": 1716,
+    "tokens_in": 157,
+    "tokens_out": 20,
+    "state": "succeeded"
+  },
+  {
+    "id": "ff82b0bf-9cf0-4b02-b592-ff1bd90f9655",
+    "request_id": "152f8d90-b64f-4392-a764-d7167434c42d",
+    "source": "stand-in",
+    "created": 1794551360.4430509,
+    "estimated": 1716,
+    "tokens_in": 157,
+    "tokens_out": 20,
+    "state": "succeeded"
+  },
+  {
+    "id": "7befd8cf-64a3-42df-8c53-61bed9c663a0",
+    "request_id": "7e916748-0cb8-454f-a820-e2dc6296b27e",
+    "source": "stand-in",
+    "created": 1794551375.1439984,
+    "estimated": 1716,
+    "tokens_in": 157,
+    "tokens_out": 20,
+    "state": "succeeded"
+  },
+  {
+    "id": "463fe2ff-1edc-4527-9c9d-dfef793cd7d5",
+    "request_id": "62495d95-6786-477c-a98e-9152a7201710",
+    "source": "stand-in",
+    "created": 1794551375.9263773,
+    "estimated": 1716,
+    "tokens_in": 157,
+    "tokens_out": 20,
+    "state": "succeeded"
+  }
+]
