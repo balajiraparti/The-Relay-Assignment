@@ -1,0 +1,12 @@
+{
+  "request_id": "6eebe80c-484c-49b4-972c-eaa1393edcb8",
+  "total_ms": 2786.648399895057,
+  "retrieval_work_ms": 979.0479999501258,
+  "gateway_wait_ms": 0.06509991362690926,
+  "model_network_and_work_ms": 1308.8884002063423,
+  "retry_ms": 0,
+  "validation_storage_and_observer_overhead_ms": 498.646899824962,
+  "gateway_first_content_ms": 981.9570002146065,
+  "model_after_first_content_ms": 326.9964999053627,
+  "validated_first_token_ms": 2781.3035999424756
+}

@@ -1,0 +1,36 @@
+[
+  {
+    "event": "standin_received",
+    "request_id": "c7cb9e6f-c941-4f53-8649-a335f05f4fda",
+    "ordinal": 1,
+    "estimated_tokens": 1181,
+    "fault": false
+  },
+  {
+    "event": "standin_worker_started",
+    "request_id": "c7cb9e6f-c941-4f53-8649-a335f05f4fda",
+    "queue_ms": 0.0,
+    "delay_ms": 15954.201299929991
+  },
+  {
+    "event": "standin_received",
+    "request_id": "a2842e85-8a6d-4060-862b-7f02f41b3011",
+    "ordinal": 2,
+    "estimated_tokens": 1181,
+    "fault": false
+  },
+  {
+    "event": "standin_completed",
+    "request_id": "c7cb9e6f-c941-4f53-8649-a335f05f4fda"
+  },
+  {
+    "event": "standin_worker_started",
+    "request_id": "a2842e85-8a6d-4060-862b-7f02f41b3011",
+    "queue_ms": 15827.99999997951,
+    "delay_ms": 791.1466001532972
+  },
+  {
+    "event": "standin_completed",
+    "request_id": "a2842e85-8a6d-4060-862b-7f02f41b3011"
+  }
+]

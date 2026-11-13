@@ -15,3 +15,5 @@ runs/
 *.db-wal
 *.db-shm
 *.bak
+output/*.zip
+tmp/

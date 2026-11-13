@@ -1,0 +1,23 @@
+purpose:
+  stands_in_for: Groq chat completions HTTP/SSE dependency
+  unblocks: F07-F08 caller fault and concurrency verification without hosted calls; custom Python stand-in, not a Postman CLI simulation
+assumptions:
+  - id: local-http-stream-and-faults
+    status: supported
+    claim: The gateway handles the tested synthetic streaming, 503, 429, slow-response and midstream-failure cases.
+    reason: Tests execute the real HTTP client against an isolated Uvicorn stand-in and inspect caller state plus correlated server events.
+    verification: tests/test_gateway_http.py exercises retry counts, slot release during backoff, bounded deadlines, cancellation, persistent cooldown and unknown usage; streaming is observed over loopback.
+    source: src/relay/standin.py; src/relay/backends.py; src/relay/gateway.py; tests/test_gateway_http.py
+    updated_at: '2026-11-12'
+  - id: real-service-equivalence
+    status: unknown
+    claim: Synthetic queueing, faults and quota rules approximate real Groq under heavy load.
+    reason: Only three prior small real probes informed the optional paired latency samples. Real scheduling, errors, reset rules and load behaviour were not measured here.
+    verification: No real-service calls in F04-F08 work. Timing tests use explicit uncalibrated delays above Windows timer granularity. Fixture answers cannot evaluate quality. Owner mock discovery skipped because this assignment explicitly requires our own controllable service.
+    source: FIRST_RUN_RESULTS.md; runtime/calibration.json; tests/test_gateway_http.py
+    updated_at: '2026-11-12'
+fingerprints:
+  - id: relay-custom-standin
+    date: '2026-11-12'
+    commit: null
+    cli: Python pytest and Uvicorn; Postman CLI not used

@@ -1,0 +1,258 @@
+[
+  {
+    "request_id": "bd772504-f9b3-4f9d-ac50-819661e98866",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1014.2554000485688,
+    "total_ms": 1025.0671000685543,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "4bb8c391-8d17-4fe0-98c5-325b6374bd4f",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1113.7611002195626,
+    "total_ms": 1124.9314001761377,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "f22b8572-4bfa-4b93-ae8d-21f78616d470",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1066.3211001083255,
+    "total_ms": 1086.1611000727862,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "c36670ce-29f2-4d90-b142-b478d8bb070e",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1058.5711000021547,
+    "total_ms": 1077.5629000272602,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "6eebe80c-484c-49b4-972c-eaa1393edcb8",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 981.9570002146065,
+    "total_ms": 1308.9535001199692,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "cbf0de0f-7928-41cc-aca1-7419edd123de",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 886.8160999845713,
+    "total_ms": 941.1847998853773,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "f022c304-58d4-4ccd-a4af-2ee5d9700063",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1255.830200156197,
+    "total_ms": 1267.746000085026,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "12e7facc-8615-427c-b6f9-6e26dc77bcce",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1210.8752999920398,
+    "total_ms": 1232.057600049302,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "0d772475-26d8-4f7b-b017-096732135afb",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1096.7959999106824,
+    "total_ms": 1109.0648998506367,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "59b512bc-b8c8-4e82-9596-9a6dfb976b16",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1207.6775000896305,
+    "total_ms": 1217.5084999762475,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "4d98f0cf-26b2-4695-add9-5f8445a9a7db",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 750.1623001880944,
+    "total_ms": 762.7330999821424,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "b1ff210f-911c-48e2-98ad-9caeafcda592",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1012.8560999874026,
+    "total_ms": 1023.3624000102282,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "ca7439bc-ce90-4a65-8e58-898f2d91f1bb",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 996.3702999521047,
+    "total_ms": 1012.9275999497622,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "c3f7c0d4-860e-4383-9dd7-24a62fcd615c",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 945.5267998855561,
+    "total_ms": 959.360099863261,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "e5fd9e4e-85de-4f07-9863-8f9538b081b3",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 996.167799923569,
+    "total_ms": 1006.8101000506431,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "57386dde-11fc-40b2-a68a-a5329457c2b7",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 811.3172000739723,
+    "total_ms": 819.6867001242936,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "b32f7b7b-b0f6-41a9-969b-8d8d864427eb",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1009.2289999593049,
+    "total_ms": 1022.0622001215816,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "9e9b9948-0047-4ec9-bd28-3e86d314d755",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 838.4521999396384,
+    "total_ms": 847.057499922812,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "ea218623-83cc-4edb-8ec3-f4ae9aaadf2a",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 745.7018999848515,
+    "total_ms": 755.6299997959286,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "7fcae8f4-4cfd-460a-8ced-cf53696ce99d",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 585.658400086686,
+    "total_ms": 598.1066999956965,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "c727240e-0697-49ab-9097-09a4f7b46171",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 774.799200007692,
+    "total_ms": 784.069900168106,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "082b2a4f-a2e3-4933-8748-e95477d0c3d2",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 719.2528999876231,
+    "total_ms": 726.9588999915868,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "a0d5dcc4-cbe7-468f-8853-b208f8868e21",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 768.2545001152903,
+    "total_ms": 776.2122999411076,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "31f1e104-f372-4982-9b6b-e505057fda40",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 765.3457999695092,
+    "total_ms": 778.8107998203486,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "1f3ec3a5-c45f-43c8-9c45-6b08b9306274",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 809.2449000105262,
+    "total_ms": 821.0648000240326,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "f7e9de6d-3ca0-47cb-9194-e257235ce114",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 843.6898000072688,
+    "total_ms": 859.6479999832809,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "ab49fc35-db4f-4990-9004-7c893f6f1911",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 718.3523001149297,
+    "total_ms": 760.4804001748562,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "3c3deb12-d760-4bcd-9988-0659130b6bdd",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 801.8066000659019,
+    "total_ms": 817.0317001640797,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "e8ba9449-b11c-4be6-bc52-a836606622d9",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 1265.6302999239415,
+    "total_ms": 1274.906899780035,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "77d0fff7-1b3c-472d-abfa-e648edbb0d1f",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 847.5110998842865,
+    "total_ms": 908.3561999723315,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "f783cd74-4952-4005-8cec-c7bf70e2554f",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 901.9360998645425,
+    "total_ms": 931.6264998633415,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  },
+  {
+    "request_id": "dbdd335a-8835-4572-9fa7-45fbfd7135e3",
+    "source": "groq",
+    "status": "ok",
+    "first_token_ms": 807.9944998025894,
+    "total_ms": 830.2870998159051,
+    "measurement_scope": "successful gateway call; includes queue/retry waits; censored failures excluded"
+  }
+]

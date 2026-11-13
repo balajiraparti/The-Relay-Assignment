@@ -1,0 +1,33 @@
+{
+  "id": "cec01f75-fc0e-4f1d-919b-911a36983a6a",
+  "kind": "load",
+  "state": "completed",
+  "source": "stand-in",
+  "scenario": "retry_comparison_three_attempts",
+  "created_at": "2026-11-13T06:34:08.577238+00:00",
+  "expected_arrivals": 16,
+  "interval_seconds": 0.1,
+  "profile": {
+    "workers": 1,
+    "queue_limit": 4,
+    "rpm": 1000,
+    "tpm": 80000,
+    "rpd": 1000,
+    "tpd": 2000000,
+    "first_delay": 0.4,
+    "chunk_delay": 0.02,
+    "load_factor": 0.1,
+    "failure_rate": 0.0,
+    "fail_after_chunks": 0,
+    "fail_first_requests": 6,
+    "seed": 42,
+    "calibration": null,
+    "log_dir": "D:\\Projects\\The Relay Assignment\\runtime\\runs\\cec01f75-fc0e-4f1d-919b-911a36983a6a\\logs"
+  },
+  "max_attempts": 3,
+  "retrieval": "fixed synthetic fixture; isolates gateway/provider, not CPU retrieval throughput",
+  "calibration_sha256": "6fc5e6156ce385e3b87764bd851024a1e53b6eb8cc58c89648194fbd6f61ced5",
+  "queue_peak": 10,
+  "schedule_lag_max_ms": 93.29350013285875,
+  "preconditioning_calls": 0
+}

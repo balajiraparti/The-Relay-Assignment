@@ -1,0 +1,247 @@
+{
+  "bd772504-f9b3-4f9d-ac50-819661e98866": {
+    "grade": "correct",
+    "rationale": "Transformer PDF p4 states the dot products, sqrt(d_k) scaling, softmax and weighted V matrix formula.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "126bcc9b437c81838c1348ca469a7d34650b41255284f04fc7ade22933ad3666"
+  },
+  "4bb8c391-8d17-4fe0-98c5-325b6374bd4f": {
+    "grade": "refused_wrongly",
+    "rationale": "Citation-validation refusal despite an answerable scaled-attention question; reference evidence Transformer p4.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "2f658fbeb001da5d7b0869c31d9fccc359a574b98a24f035362b514407a2180d"
+  },
+  "f22b8572-4bfa-4b93-ae8d-21f78616d470": {
+    "grade": "refused_wrongly",
+    "rationale": "Citation-validation refusal on positional encoding; Transformer p6 supplies the answer.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "30b9c4e63d9451e7c512f7d08c79bdc81b201239d8eb12a683cc98bb3a4eb0d3"
+  },
+  "c36670ce-29f2-4d90-b142-b478d8bb070e": {
+    "grade": "correct",
+    "rationale": "Cited p6 excerpts support absent recurrence/convolution, summed embeddings, relative positions and possible extrapolation.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "7c8e271b0053a146e0dd99a78dc2c552c1a19d994bbab21d3587002bfa17fc02"
+  },
+  "6eebe80c-484c-49b4-972c-eaa1393edcb8": {
+    "grade": "correct",
+    "rationale": "The two cited p6 excerpts support order information, sinusoidal relative positioning and potential extrapolation.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "88637df1c2b7c85effad1213a251627655a326991395a48b19b7ea02d8be7092"
+  },
+  "cbf0de0f-7928-41cc-aca1-7419edd123de": {
+    "grade": "wrong",
+    "rationale": "The masking description is mostly correct but says blocking left-to-right information flow. The cited p5 says prevent leftward information flow; legal dependence on earlier positions is not blocked.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "955aae97e7c33198237ee8b50bda3c2d8240d5755b710107ed96d1c3e19a4258"
+  },
+  "f022c304-58d4-4ccd-a4af-2ee5d9700063": {
+    "grade": "refused_wrongly",
+    "rationale": "Citation-validation refusal despite Moshi pp6/17 explaining parallel streams and simultaneous speaking/listening.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "6e63121a18843641e672556cf78623d51cb207b235cf74fbd928eb25784eeaf0"
+  },
+  "12e7facc-8615-427c-b6f9-6e26dc77bcce": {
+    "grade": "correct",
+    "rationale": "Cited Moshi pp6/17 support full duplex, separate user/system streams, overlap and no explicit turn boundary; no first-ever claim.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "56f829eb4ccd1fc1021f3a0b0f257cedc7d31c09432efb4bfa8f233d7e8b5cbf"
+  },
+  "0d772475-26d8-4f7b-b017-096732135afb": {
+    "grade": "wrong",
+    "rationale": "Core full-duplex explanation is supported, but says model decodes user audio. Cited p17 instead says actual user audio is used and user predictions are ignored; decoding received audio is not established by these citations.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "b5a1229ebf5fadfe91c7a260b0cc27b96a1b50f1a9d4a238c15236153e7f9462"
+  },
+  "59b512bc-b8c8-4e82-9596-9a6dfb976b16": {
+    "grade": "wrong",
+    "rationale": "The answer blurs training transcription construction with runtime Inner Monologue by saying using Whisper to obtain transcription. The p15 definition constructs training text W; a runtime Whisper dependency is not established. Conservative grade for a misleading mechanism explanation.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "2917125a96bf8693b5000b66e331448f5836041afcb53dd75ad620e777ad75b1"
+  },
+  "4d98f0cf-26b2-4695-add9-5f8445a9a7db": {
+    "grade": "refused_wrongly",
+    "rationale": "Citation-validation refusal although Mimi's streaming codec role is described in Moshi p6 and reconstruction/causality on p24.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "29138a1999e645290505685348b84bb057927530c92e88c735eab9decc6dee72"
+  },
+  "b1ff210f-911c-48e2-98ad-9caeafcda592": {
+    "grade": "correct",
+    "rationale": "Cited p24 supports causal low-latency audio representation/reconstruction and the comparison to non-causal codecs; the answer is narrower than the full semantic/acoustic description.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "919e8c1e4d7af8638f7653e03c3cd47b7115e82fc0cea8a12598c3ece20b1ef5"
+  },
+  "ca7439bc-ce90-4a65-8e58-898f2d91f1bb": {
+    "grade": "refused_wrongly",
+    "rationale": "Citation-validation refusal on learned segmentation despite dynamic-chunking p2 describing the problem.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "b4d312c130b8bd3028fa144a33b558366e9bc56657dee11f796bfbd9410b597c"
+  },
+  "c3f7c0d4-860e-4383-9dd7-24a62fcd615c": {
+    "grade": "correct",
+    "rationale": "Both cited p2 excerpts directly discuss tokenizer-free efficiency, learnability, discrete-boundary supervision and stability at scale.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "1e5f5ac2480e3c9b29d30c74acffe6f574505258f262fa26e531c22fec609999"
+  },
+  "e5fd9e4e-85de-4f07-9863-8f9538b081b3": {
+    "grade": "refused_wrongly",
+    "rationale": "Citation-validation refusal on the answerable H-Net architecture question; dynamic-chunking pp2-3 describe the components.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "17340f364982f7813466783506bd804f4bba50aeec77981b1bdedcb0393e35f8"
+  },
+  "57386dde-11fc-40b2-a68a-a5329457c2b7": {
+    "grade": "refused_wrongly",
+    "rationale": "Citation-validation refusal on the answerable H-Net architecture question; dynamic-chunking pp2-3 describe the components.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "8dca0b3b380603c34772996fd40b5310ae2f54e0c2b06368e6a5b798902bc0db"
+  },
+  "b32f7b7b-b0f6-41a9-969b-8d8d864427eb": {
+    "grade": "wrong",
+    "rationale": "Content-agnostic pooling and semantic downsampling are supported, but the added long-range-dependency and representation-allocation claims are not established in the cited pp31/3 excerpts.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "97df9cb0fea6f6fbb6b4ee531370c4bc8f4d10775784579d9b8a7730c8449080"
+  },
+  "9e9b9948-0047-4ec9-bd28-3e86d314d755": {
+    "grade": "correct",
+    "rationale": "Cited p32 explicitly says fixed boundaries split words, morphemes and phrases, limiting expressivity; p31 defines static chunking.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "5c7dac2ddff93e51fbc924f1029445cfc5dadbe285588f9a5e719f2e84560833"
+  },
+  "ea218623-83cc-4edb-8ec3-f4ae9aaadf2a": {
+    "grade": "refused_correctly",
+    "rationale": "No current Groq quota information belongs to this fixed paper corpus; explicit insufficient-evidence refusal.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "af4d283dec969f85e70df60038f5342718c8a08ea07441e6c45465086e36a709"
+  },
+  "7fcae8f4-4cfd-460a-8ced-cf53696ce99d": {
+    "grade": "refused_correctly",
+    "rationale": "No current Groq quota information belongs to this fixed paper corpus; explicit insufficient-evidence refusal.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "18fffddd89df0be0ab98602d49b0810323b54ff6b809af9e4470918d8f45f5c7"
+  },
+  "c727240e-0697-49ab-9097-09a4f7b46171": {
+    "grade": "refused_correctly",
+    "rationale": "No current Groq quota information belongs to this fixed paper corpus; explicit insufficient-evidence refusal.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "91292250930baf5e6961d01cf7ebf189d77d30b78906cbe204b1efb9c1655b78"
+  },
+  "082b2a4f-a2e3-4933-8748-e95477d0c3d2": {
+    "grade": "refused_correctly",
+    "rationale": "The corpus does not report OpenAI 2025 revenue; explicit refusal.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "d6f6da840a9b2faac1a75ffd167ad196cbc755a9dd4c476443b1dfcd7b84910f"
+  },
+  "a0d5dcc4-cbe7-468f-8853-b208f8868e21": {
+    "grade": "refused_correctly",
+    "rationale": "The corpus does not report OpenAI 2025 revenue; explicit refusal.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "a8cd14c1331282c92d59673f5a758923e959b9c6c1a38f9c3ca519d882dcee61"
+  },
+  "31f1e104-f372-4982-9b6b-e505057fda40": {
+    "grade": "refused_correctly",
+    "rationale": "The corpus does not report OpenAI 2025 revenue; explicit refusal.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "14f67c52fd6b1f594f321a4d8a658ddc0a80cc2555f104ce0ef744cda1e7d276"
+  },
+  "1f3ec3a5-c45f-43c8-9c45-6b08b9306274": {
+    "grade": "refused_correctly",
+    "rationale": "No private training-cluster password is provided by the papers; explicit refusal.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "008461c8f3d4799079c1d1d25058ce9c06c9db815a2dae0162ade53ff4072501"
+  },
+  "f7e9de6d-3ca0-47cb-9194-e257235ce114": {
+    "grade": "refused_correctly",
+    "rationale": "No private training-cluster password is provided by the papers; explicit refusal.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "7f9e2e0a338c88dd3edc3c3def882c1156fab3b61b0f69ed748384baf37919c4"
+  },
+  "ab49fc35-db4f-4990-9004-7c893f6f1911": {
+    "grade": "refused_correctly",
+    "rationale": "No private training-cluster password is provided by the papers; explicit refusal.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "1510e7fc13f45ed07ea9a9f33515a822bc22a0f4a9a59454f0ed4dbc9a82c436"
+  },
+  "3c3deb12-d760-4bcd-9988-0659130b6bdd": {
+    "grade": "correct",
+    "rationale": "Corrects the recurrent-layer premise and cites Transformer p6 for no recurrence and sinusoidal position information.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "c3f5dc1388a2f2f3d8d9bd5985a5f4ca7f64ccf9eca53e32828f94bc161a53b4"
+  },
+  "e8ba9449-b11c-4be6-bc52-a836606622d9": {
+    "grade": "correct",
+    "rationale": "Direct p6 citation supports no recurrence/convolution and summed position encodings at encoder/decoder inputs.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "81a47e05b36012ccc32c6fd281a27cbe48818c3e12b8f1e87a6db4d90746a3eb"
+  },
+  "d18549be-85b3-40db-b2d6-8ca17d188a73": {
+    "grade": "refused_correctly",
+    "rationale": "Asks which paper/mechanism is intended instead of guessing. Rubric maps clarification to correct refusal, separately recorded as needs_clarification.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "7e8fb0051289d4dfba2a3ff5e8ad5ca6b03bb5b84976e606150b3a48d29d9099"
+  },
+  "dbde9448-de6c-4ecc-bfd0-60ae5a9be58a": {
+    "grade": "refused_correctly",
+    "rationale": "Asks which paper/mechanism is intended instead of guessing. Rubric maps clarification to correct refusal, separately recorded as needs_clarification.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "a2b80d173b4d9260ed29a059cf3d2b5de07758a9a8038cee40a82e19fb8b1ac5"
+  },
+  "64bde111-af96-44ab-ac45-99917cd6ef5e": {
+    "grade": "refused_correctly",
+    "rationale": "Asks which paper/mechanism is intended instead of guessing. Rubric maps clarification to correct refusal, separately recorded as needs_clarification.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "d3d2591179b9ecec25639e68df0d0a877c13192af1132487fc1a736eb7ce9d08"
+  },
+  "77d0fff7-1b3c-472d-abfa-e648edbb0d1f": {
+    "grade": "refused_correctly",
+    "rationale": "Refuses the unsupported universal hallucination-elimination premise.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "ac3f62db02b74fed09283bff4ad7b346fd44793583dc73c625db554a1d10370a"
+  },
+  "f783cd74-4952-4005-8cec-c7bf70e2554f": {
+    "grade": "refused_correctly",
+    "rationale": "Refuses the unsupported universal hallucination-elimination premise.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "aa019e9b6be67fe1c524f2b1f634023d95fe0c42f3a463db72356653aaa334e7"
+  },
+  "dbdd335a-8835-4572-9fa7-45fbfd7135e3": {
+    "grade": "refused_correctly",
+    "rationale": "Refuses the unsupported universal hallucination-elimination premise.",
+    "reviewer": "Assistant offline evidence review; author verification pending",
+    "author_verified": false,
+    "resource_sha256": "f7d683b38f1691ab4b7c8259f76a13cfbae19421d7ec2d174abdbb4414aa9576"
+  }
+}

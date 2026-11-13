@@ -3,3 +3,7 @@
 *.md text eol=lf
 *.toml text eol=lf
 *.pdf binary
+*.json text eol=lf
+requirements.lock.txt text eol=lf
+# Evidence hashes cover exact bytes; never rewrite their line endings on checkout.
+evidence/** -text

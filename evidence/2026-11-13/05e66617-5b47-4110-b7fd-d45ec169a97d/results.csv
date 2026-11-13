@@ -1,0 +1,9 @@
+request_id,scenario,source,start_time,first_token_ms,total_ms,status,retries,tokens_in,tokens_out,retrieval_setting,answer_grade
+5cf2fc54-8f66-4631-9c5d-ee851cbf7989,daily_budget_exhausted,stand-in,2026-11-13T06:30:47.704959+00:00,,763.9985999558121,rate_limited,0,,,R2,
+2bf7aeb3-92ea-4e46-baab-b1207de8775e,daily_budget_exhausted,stand-in,2026-11-13T06:30:47.908439+00:00,,625.0700000673532,rate_limited,0,0,0,R2,
+77146ea4-c3f2-42eb-8301-b52ad33dc57d,daily_budget_exhausted,stand-in,2026-11-13T06:30:48.085968+00:00,,773.5995000693947,rate_limited,0,0,0,R2,
+4f2dfde3-ca77-491c-9b79-6ae894e9089d,daily_budget_exhausted,stand-in,2026-11-13T06:30:47.854957+00:00,,1131.3473000191152,rate_limited,0,,,R2,
+21219e38-464c-4bc7-93d0-ee66b9e0590a,daily_budget_exhausted,stand-in,2026-11-13T06:30:48.165376+00:00,,970.4024000093341,rate_limited,0,0,0,R2,
+21d29f74-0d86-4e7f-82c7-0103998950a0,daily_budget_exhausted,stand-in,2026-11-13T06:30:48.491278+00:00,,770.8352999761701,rate_limited,0,0,0,R2,
+ff0cd8fa-de9d-4dab-8602-1a20bd0926a4,daily_budget_exhausted,stand-in,2026-11-13T06:30:48.514787+00:00,,855.1994999870658,rate_limited,0,0,0,R2,
+b4f09443-ad4c-4d57-a0db-434c9b0ffa2a,daily_budget_exhausted,stand-in,2026-11-13T06:30:48.546969+00:00,,929.7515000216663,rate_limited,0,0,0,R2,
